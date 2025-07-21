@@ -74,6 +74,8 @@ export const UserForm = ({ onSuccess }: UserFormProps) => {
   const onSubmit = async (data: UserFormData) => {
     setLoading(true);
     try {
+      console.log('🔍 Iniciando criação de usuário via Edge Function...');
+      
       // Para fornecedores, não é obrigatório ter unidade gestora
       if (data.role !== 'fornecedor' && !data.management_unit_id) {
         toast.error('Unidade gestora é obrigatória para este tipo de usuário');
@@ -81,6 +83,7 @@ export const UserForm = ({ onSuccess }: UserFormProps) => {
       }
 
       // Chamar Edge Function para criar usuário
+      console.log('📞 Chamando Edge Function create-user...', data);
       const { data: result, error: createError } = await supabase.functions.invoke('create-user', {
         body: {
           email: data.email,
@@ -91,6 +94,7 @@ export const UserForm = ({ onSuccess }: UserFormProps) => {
           management_unit_id: data.management_unit_id,
         }
       });
+      console.log('📝 Resposta da Edge Function:', { result, createError });
 
       if (createError) {
         throw new Error(createError.message || 'Erro ao criar usuário');
