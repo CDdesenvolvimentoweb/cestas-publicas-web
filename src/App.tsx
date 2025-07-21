@@ -17,7 +17,7 @@ import { UnitDashboard } from "@/pages/UnitDashboard";
 import { UserManagement } from "@/pages/UserManagement";
 import { Login } from "@/pages/Login";
 import Index from "@/pages/Index";
-import NotFound from "./pages/NotFound";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
