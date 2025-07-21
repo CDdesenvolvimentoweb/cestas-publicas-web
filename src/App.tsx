@@ -18,6 +18,7 @@ import { UnitDashboard } from "@/pages/UnitDashboard";
 import { UserManagement } from "@/pages/UserManagement";
 import { Login } from "@/pages/Login";
 import Reports from "@/pages/Reports";
+import Integrations from "@/pages/Integrations";
 import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
 
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="baskets" element={<PriceBaskets />} />
             <Route path="quotations" element={<Quotations />} />
             <Route path="reports" element={<Reports />} />
+            <Route path="integrations" element={<Integrations />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="unit-dashboard" element={<UnitDashboard />} />
           </Route>

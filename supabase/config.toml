@@ -58,3 +58,12 @@ verify_jwt = false
 
 [functions.report-generator]
 verify_jwt = true
+
+[functions.price-sync]
+verify_jwt = false
+
+[functions.workflow-engine]
+verify_jwt = false
+
+[functions.ai-suggestions]
+verify_jwt = false

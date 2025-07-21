@@ -81,6 +81,12 @@ const navigationItems = [
     icon: TrendingUp,
     roles: ['admin', 'servidor'],
   },
+  {
+    title: 'Integrações',
+    href: '/app/integrations',
+    icon: Settings,
+    roles: ['admin'],
+  },
 ];
 
 export const Sidebar = ({ isOpen }: SidebarProps) => {
