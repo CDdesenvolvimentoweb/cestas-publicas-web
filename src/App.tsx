@@ -13,6 +13,7 @@ import { Products } from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
 import { Quotations } from "@/pages/Quotations";
 import { SupplierQuote } from "@/pages/SupplierQuote";
+import { Login } from "@/pages/Login";
 import Index from "@/pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -25,8 +26,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Public landing page */}
+          {/* Public routes */}
           <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/supplier-quote" element={<SupplierQuote />} />
           
           {/* Protected routes */}
           <Route path="/dashboard" element={
@@ -52,10 +55,6 @@ const App = () => (
           
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-        {/* Public routes outside AuthLayout */}
-        <Routes>
-          <Route path="/supplier-quote" element={<SupplierQuote />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
