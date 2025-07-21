@@ -13,6 +13,7 @@ import { Products } from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
 import { Quotations } from "@/pages/Quotations";
 import { SupplierQuote } from "@/pages/SupplierQuote";
+import { UserManagement } from "@/pages/UserManagement";
 import { Login } from "@/pages/Login";
 import Index from "@/pages/Index";
 import NotFound from "./pages/NotFound";
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="products" element={<Products />} />
             <Route path="baskets" element={<PriceBaskets />} />
             <Route path="quotations" element={<Quotations />} />
+            <Route path="user-management" element={<UserManagement />} />
           </Route>
           
           {/* Catch-all route */}

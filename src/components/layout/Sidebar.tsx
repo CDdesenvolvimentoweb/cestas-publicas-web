@@ -62,6 +62,12 @@ const navigationItems = [
     icon: Building2,
     roles: ['admin'],
   },
+  {
+    title: 'Gestão de Usuários',
+    href: '/app/user-management',
+    icon: Users,
+    roles: ['admin'],
+  },
 ];
 
 export const Sidebar = ({ isOpen }: SidebarProps) => {
