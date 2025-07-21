@@ -80,35 +80,27 @@ export const UserForm = ({ onSuccess }: UserFormProps) => {
         return;
       }
 
-      // Criar o usuário no Supabase Auth primeiro
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: data.email,
-        password: 'TempPassword123!', // Senha temporária
-        email_confirm: true,
+      // Chamar Edge Function para criar usuário
+      const { data: result, error: createError } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: data.email,
+          full_name: data.full_name,
+          cpf: data.cpf,
+          phone: data.phone,
+          role: data.role,
+          management_unit_id: data.management_unit_id,
+        }
       });
 
-      if (authError) throw authError;
-
-      if (!authData.user) {
-        throw new Error('Erro ao criar usuário no sistema de autenticação');
+      if (createError) {
+        throw new Error(createError.message || 'Erro ao criar usuário');
       }
 
-      // Criar o perfil do usuário
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          full_name: data.full_name,
-          cpf: data.cpf || null,
-          phone: data.phone || null,
-          role: data.role,
-          management_unit_id: data.management_unit_id || null,
-          is_active: true,
-        });
+      if (result?.error) {
+        throw new Error(result.error);
+      }
 
-      if (profileError) throw profileError;
-
-      toast.success('Usuário criado com sucesso!');
+      toast.success(result?.message || 'Usuário criado com sucesso!');
       form.reset();
       onSuccess?.();
     } catch (error: any) {
