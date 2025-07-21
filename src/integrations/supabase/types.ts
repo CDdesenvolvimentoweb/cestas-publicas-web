@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          description: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          description: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          description?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       api_sync_logs: {
         Row: {
           api_id: string
@@ -162,6 +201,42 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_reports: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          file_url: string | null
+          generated_by: string | null
+          id: string
+          parameters: Json | null
+          report_name: string
+          report_type: string
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          parameters?: Json | null
+          report_name: string
+          report_type: string
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          file_url?: string | null
+          generated_by?: string | null
+          id?: string
+          parameters?: Json | null
+          report_name?: string
+          report_type?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       index_values: {
         Row: {
           created_at: string | null
@@ -289,6 +364,78 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           source_url?: string | null
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          push_notifications: boolean | null
+          quote_reminders: boolean | null
+          quote_responses: boolean | null
+          system_updates: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          push_notifications?: boolean | null
+          quote_reminders?: boolean | null
+          quote_responses?: boolean | null
+          system_updates?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          push_notifications?: boolean | null
+          quote_reminders?: boolean | null
+          quote_responses?: boolean | null
+          system_updates?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          is_read: boolean | null
+          message: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -973,6 +1120,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      analyze_price_trends: {
+        Args: {
+          product_id_param?: string
+          management_unit_id_param?: string
+          days_back?: number
+        }
+        Returns: {
+          product_id: string
+          product_name: string
+          category_name: string
+          avg_price: number
+          min_price: number
+          max_price: number
+          price_variance: number
+          trend_direction: string
+          quote_count: number
+        }[]
+      }
       approve_product_request: {
         Args: { request_id: string; admin_response_param?: string }
         Returns: string
@@ -1004,6 +1169,16 @@ export type Database = {
         }
         Returns: Json
       }
+      create_notification: {
+        Args: {
+          user_id_param: string
+          type_param: string
+          title_param: string
+          message_param: string
+          data_param?: Json
+        }
+        Returns: string
+      }
       create_quote_token: {
         Args: { quote_uuid: string }
         Returns: string
@@ -1032,6 +1207,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      get_dashboard_statistics: {
+        Args: { management_unit_id_param?: string; days_back?: number }
+        Returns: Json
+      }
       get_management_unit_stats: {
         Args: { unit_id: string }
         Returns: Json
@@ -1049,6 +1228,20 @@ export type Database = {
       }
       is_valid_management_unit: {
         Args: { unit_id: string }
+        Returns: boolean
+      }
+      log_activity: {
+        Args: {
+          action_type_param: string
+          entity_type_param: string
+          entity_id_param: string
+          description_param: string
+          metadata_param?: Json
+        }
+        Returns: string
+      }
+      mark_notification_read: {
+        Args: { notification_id_param: string }
         Returns: boolean
       }
       reject_product_request: {
