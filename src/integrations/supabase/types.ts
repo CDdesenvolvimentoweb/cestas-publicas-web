@@ -529,6 +529,88 @@ export type Database = {
           },
         ]
       }
+      product_requests: {
+        Row: {
+          admin_response: string | null
+          anvisa_code: string | null
+          category_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          justification: string
+          management_unit_id: string
+          measurement_unit_id: string | null
+          product_code: string | null
+          product_name: string
+          requester_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          specification: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_response?: string | null
+          anvisa_code?: string | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          justification: string
+          management_unit_id: string
+          measurement_unit_id?: string | null
+          product_code?: string | null
+          product_name: string
+          requester_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specification?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_response?: string | null
+          anvisa_code?: string | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          justification?: string
+          management_unit_id?: string
+          measurement_unit_id?: string | null
+          product_code?: string | null
+          product_name?: string
+          requester_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          specification?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_requests_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_requests_management_unit_id_fkey"
+            columns: ["management_unit_id"]
+            isOneToOne: false
+            referencedRelation: "management_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_requests_measurement_unit_id_fkey"
+            columns: ["measurement_unit_id"]
+            isOneToOne: false
+            referencedRelation: "measurement_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           anvisa_code: string | null
@@ -891,6 +973,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_product_request: {
+        Args: { request_id: string; admin_response_param?: string }
+        Returns: string
+      }
+      check_product_duplication: {
+        Args: {
+          product_name_param: string
+          product_code_param?: string
+          anvisa_code_param?: string
+          exclude_id?: string
+        }
+        Returns: Json
+      }
       create_quote_token: {
         Args: { quote_uuid: string }
         Returns: string
@@ -914,6 +1009,22 @@ export type Database = {
       is_valid_management_unit: {
         Args: { unit_id: string }
         Returns: boolean
+      }
+      reject_product_request: {
+        Args: { request_id: string; admin_response_param: string }
+        Returns: undefined
+      }
+      search_similar_products: {
+        Args: { search_term: string; limit_param?: number }
+        Returns: {
+          id: string
+          name: string
+          code: string
+          anvisa_code: string
+          category_name: string
+          measurement_unit: string
+          similarity_score: number
+        }[]
       }
     }
     Enums: {

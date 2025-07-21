@@ -60,17 +60,19 @@ interface MeasurementUnit {
 }
 
 interface ProductFormProps {
-  isOpen: boolean;
+  product?: any;
   onClose: () => void;
   onSuccess: () => void;
-  product?: any;
+  onCheckDuplicates?: (name: string, code?: string, anvisaCode?: string, excludeId?: string) => Promise<boolean>;
+  duplicates?: any[];
 }
 
 export const ProductForm = ({
-  isOpen,
   onClose,
   onSuccess,
   product,
+  onCheckDuplicates,
+  duplicates = [],
 }: ProductFormProps) => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -92,7 +94,9 @@ export const ProductForm = ({
   });
 
   useEffect(() => {
-    if (isOpen) {
+    fetchCategories();
+    fetchMeasurementUnits();
+    if (product) {
       fetchCategories();
       fetchMeasurementUnits();
       if (product) {
@@ -119,7 +123,7 @@ export const ProductForm = ({
         });
       }
     }
-  }, [isOpen, product, form]);
+  }, [product, form]);
 
   const fetchCategories = async () => {
     try {
@@ -225,7 +229,7 @@ export const ProductForm = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>

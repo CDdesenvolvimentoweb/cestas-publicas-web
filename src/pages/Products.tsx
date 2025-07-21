@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Search, Package, Tag, Ruler } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Package, Tag, Ruler, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ProductForm } from '@/components/products/ProductForm';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ProductRequestForm } from '@/components/products/ProductRequestForm';
+import { ProductRequestsList } from '@/components/products/ProductRequestsList';
 
 interface Product {
   id: string;
@@ -29,13 +33,24 @@ interface Product {
   };
 }
 
-export const Products = () => {
+interface DuplicateProduct {
+  id: string;
+  name: string;
+  code?: string;
+  anvisa_code?: string;
+  match_type: 'name' | 'code' | 'anvisa_code' | 'partial';
+}
+
+export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [showRequestForm, setShowRequestForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [duplicates, setDuplicates] = useState<DuplicateProduct[]>([]);
+  const [activeTab, setActiveTab] = useState("products");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -80,14 +95,41 @@ export const Products = () => {
     }
   };
 
+  const checkForDuplicates = async (name: string, code?: string, anvisaCode?: string, excludeId?: string) => {
+    try {
+      const { data, error } = await supabase.rpc('check_product_duplication', {
+        product_name_param: name,
+        product_code_param: code || null,
+        anvisa_code_param: anvisaCode || null,
+        exclude_id: excludeId || null
+      });
+
+      if (error) throw error;
+      
+      const duplicatesList = Array.isArray(data) ? data.filter(Boolean) : [];
+      setDuplicates(duplicatesList as unknown as DuplicateProduct[]);
+      
+      return duplicatesList.length > 0;
+    } catch (error) {
+      console.error("Error checking duplicates:", error);
+      return false;
+    }
+  };
+
   const handleCreate = () => {
     setEditingProduct(null);
+    setDuplicates([]);
     setIsFormOpen(true);
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
+    setDuplicates([]);
     setIsFormOpen(true);
+  };
+
+  const handleRequestProduct = () => {
+    setShowRequestForm(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -133,7 +175,9 @@ export const Products = () => {
 
   const handleFormSuccess = () => {
     setIsFormOpen(false);
+    setShowRequestForm(false);
     setEditingProduct(null);
+    setDuplicates([]);
     fetchProducts();
   };
 
@@ -173,46 +217,81 @@ export const Products = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-foreground">Produtos</h1>
-        <Button onClick={handleCreate} className="hover-scale">
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Produto
-        </Button>
-      </div>
-
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nome, código, categoria..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex items-center space-x-2">
+          <Package className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold">Catálogo de Produtos</h1>
         </div>
-        <Badge variant="outline">{filteredProducts.length} produtos</Badge>
       </div>
 
-      {filteredProducts.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="text-center space-y-2">
-              <h3 className="text-lg font-medium">Nenhum produto encontrado</h3>
-              <p className="text-muted-foreground">
-                {searchTerm 
-                  ? "Tente ajustar os termos de busca" 
-                  : "Comece cadastrando um novo produto"}
-              </p>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="products">Produtos</TabsTrigger>
+          <TabsTrigger value="requests">Solicitações de Produtos</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="products" className="space-y-6">
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-between">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Buscar produtos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            {!searchTerm && (
-              <Button onClick={handleCreate} className="mt-4">
-                <Plus className="w-4 h-4 mr-2" />
-                Cadastrar Primeiro Produto
+            <div className="flex gap-2">
+              <Button onClick={handleRequestProduct} variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Solicitar Produto
               </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
+              <Button onClick={handleCreate}>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Produto
+              </Button>
+            </div>
+          </div>
+
+          {duplicates.length > 0 && (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <div className="space-y-2">
+                  <p className="font-medium">Produtos similares encontrados:</p>
+                  {duplicates.map((dup) => (
+                    <div key={dup.id} className="text-sm">
+                      <strong>{dup.name}</strong>
+                      {dup.code && <span> - Código: {dup.code}</span>}
+                      {dup.anvisa_code && <span> - ANVISA: {dup.anvisa_code}</span>}
+                      <Badge variant="outline" className="ml-2">
+                        {dup.match_type === 'name' && 'Nome igual'}
+                        {dup.match_type === 'code' && 'Código igual'}
+                        {dup.match_type === 'anvisa_code' && 'Código ANVISA igual'}
+                        {dup.match_type === 'partial' && 'Nome similar'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {filteredProducts.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Package className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhum produto encontrado</h3>
+                <p className="text-muted-foreground text-center mb-4">
+                  {searchTerm ? "Tente ajustar os termos de busca" : "Comece criando seu primeiro produto"}
+                </p>
+                <Button onClick={handleCreate}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Produto
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredProducts.map((product) => (
             <Card key={product.id} className="hover-scale">
@@ -293,22 +372,44 @@ export const Products = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="requests">
+          <ProductRequestsList />
+        </TabsContent>
+      </Tabs>
+
+      {isFormOpen && (
+        <ProductForm
+          product={editingProduct}
+          onClose={() => {
+            setIsFormOpen(false);
+            setEditingProduct(null);
+            setDuplicates([]);
+          }}
+          onSuccess={handleFormSuccess}
+          onCheckDuplicates={checkForDuplicates}
+          duplicates={duplicates}
+        />
       )}
 
-      <ProductForm
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSuccess={handleFormSuccess}
-        product={editingProduct}
-      />
+      {showRequestForm && (
+        <ProductRequestForm
+          onClose={() => setShowRequestForm(false)}
+          onSuccess={handleFormSuccess}
+          onCheckDuplicates={checkForDuplicates}
+          duplicates={duplicates}
+        />
+      )}
 
       <ConfirmDialog
         isOpen={!!deleteConfirm}
         onClose={() => setDeleteConfirm(null)}
         onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
-        title="Excluir Produto"
-        description="Esta ação não pode ser desfeita. Certifique-se de que este produto não está sendo usado em cestas de preços."
+        title="Desativar Produto"
+        description="Tem certeza que deseja desativar este produto? Esta ação não pode ser desfeita."
       />
     </div>
   );

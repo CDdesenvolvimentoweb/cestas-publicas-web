@@ -9,7 +9,7 @@ import { Dashboard } from "@/pages/Dashboard";
 import { ManagementUnits } from "@/pages/ManagementUnits";
 import { Suppliers } from "@/pages/Suppliers";
 import { ProductCategories } from "@/pages/ProductCategories";
-import { Products } from "@/pages/Products";
+import Products from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
 import { Quotations } from "@/pages/Quotations";
 import { SupplierQuote } from "@/pages/SupplierQuote";
