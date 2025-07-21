@@ -62,11 +62,14 @@ Deno.serve(async (req) => {
     }
 
     // Check if user is admin
+    console.log('Checking user profile for user ID:', user.id)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
+
+    console.log('Profile check result:', { profile, profileError })
 
     if (profileError || profile?.role !== 'admin') {
       console.error('Profile error or not admin:', profileError, profile)
@@ -75,6 +78,8 @@ Deno.serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log('User is admin, proceeding with user creation')
 
     // Parse request body
     const body: CreateUserRequest = await req.json()
