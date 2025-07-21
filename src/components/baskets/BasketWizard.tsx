@@ -80,15 +80,29 @@ export const BasketWizard = ({
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
+      console.log('Profile data:', profile);
+      console.log('Management unit ID:', profile?.management_unit_id);
+      console.log('User ID:', profile?.id);
+      
+      if (!profile?.management_unit_id) {
+        throw new Error('Unidade gestora não encontrada no perfil do usuário');
+      }
+      
+      if (!profile?.id) {
+        throw new Error('ID do usuário não encontrado');
+      }
+      
       const cleanData = {
         name: data.name,
         description: data.description || null,
         reference_date: data.reference_date.toISOString().split('T')[0],
         calculation_type: data.calculation_type,
         is_finalized: false,
-        management_unit_id: profile?.management_unit_id,
-        created_by: profile?.id,
+        management_unit_id: profile.management_unit_id,
+        created_by: profile.id,
       };
+      
+      console.log('Data to insert:', cleanData);
 
       const { data: basket, error } = await supabase
         .from('price_baskets')
