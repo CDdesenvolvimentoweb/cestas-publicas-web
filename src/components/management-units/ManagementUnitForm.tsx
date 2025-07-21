@@ -185,9 +185,11 @@ export const ManagementUnitForm = ({
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      // Convert empty strings to null for optional fields
+      // Keep required fields as-is, only convert optional fields to null
       const cleanData = {
-        ...data,
+        name: data.name, // required
+        city_id: data.city_id, // required
+        is_active: data.is_active, // required with default
         cnpj: data.cnpj || null,
         address: data.address || null,
         phone: data.phone || null,

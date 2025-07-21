@@ -204,9 +204,12 @@ export const SupplierForm = ({
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      // Convert empty strings to null for optional fields
+      // Keep required fields as-is, only convert optional fields to null
       const cleanData = {
-        ...data,
+        company_name: data.company_name, // required
+        cnpj: data.cnpj, // required
+        email: data.email, // required
+        is_active: data.is_active, // required with default
         trade_name: data.trade_name || null,
         phone: data.phone || null,
         address: data.address || null,
