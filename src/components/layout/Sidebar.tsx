@@ -39,6 +39,12 @@ const navigationItems = [
     roles: ['admin', 'servidor'],
   },
   {
+    title: 'Categorias',
+    href: '/product-categories',
+    icon: Database,
+    roles: ['admin', 'servidor'],
+  },
+  {
     title: 'Fornecedores',
     href: '/suppliers',
     icon: Building2,
