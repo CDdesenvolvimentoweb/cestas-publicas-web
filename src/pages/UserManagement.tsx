@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserForm } from '@/components/users/UserForm';
 import { UserList } from '@/components/users/UserList';
+import { ManagementUnitList } from '@/components/management-units/ManagementUnitList';
 import { ManagementUnitForm } from '@/components/management-units/ManagementUnitForm';
 import { Button } from '@/components/ui/button';
 import { Plus, Users, Building2 } from 'lucide-react';
@@ -120,10 +121,7 @@ export const UserManagement = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {/* Lista de unidades será adicionada aqui */}
-              <div className="text-center py-8 text-muted-foreground">
-                Lista de unidades gestoras será implementada aqui
-              </div>
+              <ManagementUnitList />
             </CardContent>
           </Card>
         </TabsContent>
