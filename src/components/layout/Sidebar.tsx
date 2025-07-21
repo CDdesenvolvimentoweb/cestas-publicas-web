@@ -68,6 +68,12 @@ const navigationItems = [
     icon: Users,
     roles: ['admin'],
   },
+  {
+    title: 'Dashboard Unidades',
+    href: '/app/unit-dashboard',
+    icon: TrendingUp,
+    roles: ['admin', 'servidor'],
+  },
 ];
 
 export const Sidebar = ({ isOpen }: SidebarProps) => {

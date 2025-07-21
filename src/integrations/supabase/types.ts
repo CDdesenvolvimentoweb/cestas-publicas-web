@@ -907,6 +907,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      get_management_unit_stats: {
+        Args: { unit_id: string }
+        Returns: Json
+      }
+      is_valid_management_unit: {
+        Args: { unit_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       basket_calculation_type: "media" | "mediana" | "menor_preco"

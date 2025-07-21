@@ -13,6 +13,7 @@ import { Products } from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
 import { Quotations } from "@/pages/Quotations";
 import { SupplierQuote } from "@/pages/SupplierQuote";
+import { UnitDashboard } from "@/pages/UnitDashboard";
 import { UserManagement } from "@/pages/UserManagement";
 import { Login } from "@/pages/Login";
 import Index from "@/pages/Index";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="baskets" element={<PriceBaskets />} />
             <Route path="quotations" element={<Quotations />} />
             <Route path="user-management" element={<UserManagement />} />
+            <Route path="unit-dashboard" element={<UnitDashboard />} />
           </Route>
           
           {/* Catch-all route */}
