@@ -91,11 +91,61 @@ const navigationItems = [
 
 export const Sidebar = ({ isOpen }: SidebarProps) => {
   const location = useLocation();
-  const { profile } = useAuth();
+  const { profile, loading } = useAuth();
+
+  console.log('🗂️ Sidebar render - Profile:', profile, 'Loading:', loading);
 
   const filteredItems = navigationItems.filter(item =>
     profile?.role && item.roles.includes(profile.role)
   );
+
+  console.log('🗂️ Filtered items:', filteredItems.length, 'Profile role:', profile?.role);
+
+  // Se ainda está carregando o perfil, mostra loading
+  if (loading) {
+    return (
+      <div className={cn(
+        "fixed left-0 top-0 h-full bg-card border-r border-border transition-all duration-300 z-10",
+        isOpen ? "w-64" : "w-0 overflow-hidden"
+      )}>
+        <div className="p-6">
+          <div className="flex items-center space-x-2 mb-8">
+            <Calculator className="h-8 w-8 text-primary" />
+            <h2 className="text-xl font-bold text-foreground">
+              Cestas Preços
+            </h2>
+          </div>
+          <div className="flex items-center justify-center py-8">
+            <div className="text-muted-foreground">Carregando menu...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Se não há perfil ou não há itens filtrados, mostra mensagem
+  if (!profile || filteredItems.length === 0) {
+    return (
+      <div className={cn(
+        "fixed left-0 top-0 h-full bg-card border-r border-border transition-all duration-300 z-10",
+        isOpen ? "w-64" : "w-0 overflow-hidden"
+      )}>
+        <div className="p-6">
+          <div className="flex items-center space-x-2 mb-8">
+            <Calculator className="h-8 w-8 text-primary" />
+            <h2 className="text-xl font-bold text-foreground">
+              Cestas Preços
+            </h2>
+          </div>
+          <div className="flex items-center justify-center py-8">
+            <div className="text-muted-foreground text-sm text-center">
+              {!profile ? 'Perfil não carregado' : 'Nenhum menu disponível'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn(
