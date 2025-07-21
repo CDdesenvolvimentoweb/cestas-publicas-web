@@ -32,22 +32,22 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile();
-      } else {
-        setLoading(false);
-      }
-    });
-
-    // Listen for auth changes
+    console.log('🔄 Inicializando useAuth...');
+    
+    // Listen for auth changes FIRST (to avoid missing events)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('🔄 Auth state change:', event, session?.user?.id);
+        
+        // Only synchronous state updates here
         setUser(session?.user ?? null);
+        
+        // Defer Supabase calls to prevent deadlocks
         if (session?.user) {
-          await fetchProfile();
+          setTimeout(() => {
+            console.log('📝 Buscando perfil do usuário...');
+            fetchProfile();
+          }, 0);
         } else {
           setProfile(null);
           setLoading(false);
@@ -55,20 +55,43 @@ export const useAuth = () => {
       }
     );
 
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('🔄 Sessão inicial:', session?.user?.id);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        setTimeout(() => {
+          fetchProfile();
+        }, 0);
+      } else {
+        setLoading(false);
+      }
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
   const fetchProfile = async () => {
     try {
+      console.log('📝 Iniciando busca do perfil...');
       const { profile, error } = await getUserProfile();
+      
       if (error) {
-        console.error('Error fetching profile:', error);
-      } else {
+        console.error('❌ Erro ao buscar perfil:', error);
+        // Continue with null profile instead of blocking
+        setProfile(null);
+      } else if (profile) {
+        console.log('✅ Perfil carregado:', profile);
         setProfile(profile);
+      } else {
+        console.log('⚠️ Nenhum perfil encontrado');
+        setProfile(null);
       }
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('❌ Erro crítico ao buscar perfil:', error);
+      setProfile(null);
     } finally {
+      console.log('🏁 Finalizando carregamento...');
       setLoading(false);
     }
   };

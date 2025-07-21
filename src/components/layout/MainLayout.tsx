@@ -16,13 +16,23 @@ export const MainLayout = () => {
   const { toast } = useToast();
 
   const handleSignOut = async () => {
-    const { error } = await signOut();
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao sair",
-        description: error.message,
-      });
+    try {
+      console.log('🚪 Executando logout...');
+      const { error } = await signOut();
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao sair",
+          description: error.message,
+        });
+      } else {
+        // Força refresh da página para garantir estado limpo
+        window.location.href = '/';
+      }
+    } catch (error) {
+      console.error('❌ Erro no logout:', error);
+      // Força refresh mesmo com erro
+      window.location.href = '/';
     }
   };
 
