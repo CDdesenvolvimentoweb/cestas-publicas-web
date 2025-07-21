@@ -726,6 +726,41 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_quote_tokens: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          is_used: boolean | null
+          quote_id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          is_used?: boolean | null
+          quote_id: string
+          token: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          is_used?: boolean | null
+          quote_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_quote_tokens_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supplier_quotes: {
         Row: {
           access_token: string | null
@@ -856,6 +891,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_quote_token: {
+        Args: { quote_uuid: string }
+        Returns: string
+      }
+      generate_quote_token: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_current_user_management_unit: {
         Args: Record<PropertyKey, never>
         Returns: string

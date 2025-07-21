@@ -11,6 +11,8 @@ import { Suppliers } from "@/pages/Suppliers";
 import { ProductCategories } from "@/pages/ProductCategories";
 import { Products } from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
+import { Quotations } from "@/pages/Quotations";
+import { SupplierQuote } from "@/pages/SupplierQuote";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,11 +33,16 @@ const App = () => (
               <Route path="product-categories" element={<ProductCategories />} />
               <Route path="products" element={<Products />} />
               <Route path="baskets" element={<PriceBaskets />} />
+              <Route path="quotations" element={<Quotations />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </AuthLayout>
+        {/* Public routes outside AuthLayout */}
+        <Routes>
+          <Route path="/supplier-quote" element={<SupplierQuote />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
