@@ -1,41 +1,143 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, ShoppingBasket, TrendingUp, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CalendarDays, ShoppingBasket, TrendingUp, Users, FileText, AlertCircle, Eye } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Link } from 'react-router-dom';
 
 export const Dashboard = () => {
   const { profile } = useAuth();
+  const [stats, setStats] = useState({
+    basketsCount: 0,
+    quotationsCount: 0,
+    suppliersCount: 0,
+    productsCount: 0,
+  });
+  const [recentBaskets, setRecentBaskets] = useState([]);
+  const [pendingQuotations, setPendingQuotations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const stats = [
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch stats
+      const [basketsResult, quotationsResult, suppliersResult, productsResult] = await Promise.all([
+        supabase.from('price_baskets').select('id', { count: 'exact', head: true }),
+        supabase.from('supplier_quotes').select('id', { count: 'exact', head: true }),
+        supabase.from('suppliers').select('id', { count: 'exact', head: true }),
+        supabase.from('products').select('id', { count: 'exact', head: true }),
+      ]);
+
+      setStats({
+        basketsCount: basketsResult.count || 0,
+        quotationsCount: quotationsResult.count || 0,
+        suppliersCount: suppliersResult.count || 0,
+        productsCount: productsResult.count || 0,
+      });
+
+      // Fetch recent baskets
+      const { data: baskets } = await supabase
+        .from('price_baskets')
+        .select('id, name, reference_date, is_finalized, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      setRecentBaskets(baskets || []);
+
+      // Fetch pending quotations
+      const { data: quotations } = await supabase
+        .from('supplier_quotes')
+        .select(`
+          id, 
+          due_date, 
+          status,
+          basket:price_baskets(name),
+          supplier:suppliers(company_name)
+        `)
+        .eq('status', 'pendente')
+        .order('due_date', { ascending: true })
+        .limit(5);
+
+      setPendingQuotations(quotations || []);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar dados do dashboard",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dashboardStats = [
     {
-      title: 'Cestas Ativas',
-      value: '12',
-      description: 'Cestas em andamento',
+      title: 'Cestas de Preços',
+      value: stats.basketsCount.toString(),
+      description: 'Total de cestas criadas',
       icon: ShoppingBasket,
-      color: 'text-primary',
+      color: 'text-blue-600',
+      href: '/baskets'
     },
     {
-      title: 'Cotações Pendentes',
-      value: '24',
-      description: 'Aguardando resposta',
-      icon: CalendarDays,
-      color: 'text-orange-600',
+      title: 'Cotações',
+      value: stats.quotationsCount.toString(),
+      description: 'Total de cotações enviadas',
+      icon: FileText,
+      color: 'text-green-600',
+      href: '/quotations'
     },
     {
       title: 'Fornecedores',
-      value: '156',
+      value: stats.suppliersCount.toString(),
       description: 'Cadastrados no sistema',
       icon: Users,
-      color: 'text-green-600',
+      color: 'text-purple-600',
+      href: '/suppliers'
     },
     {
-      title: 'Economia Média',
-      value: '18.5%',
-      description: 'Comparado ao mês anterior',
+      title: 'Produtos',
+      value: stats.productsCount.toString(),
+      description: 'Produtos catalogados',
       icon: TrendingUp,
-      color: 'text-blue-600',
+      color: 'text-orange-600',
+      href: '/products'
     },
   ];
+
+  const getDaysUntilDue = (dueDate: string) => {
+    const due = new Date(dueDate);
+    const now = new Date();
+    const diffTime = due.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getBadgeVariant = (days: number) => {
+    if (days < 0) return 'destructive';
+    if (days <= 2) return 'destructive';
+    if (days <= 7) return 'secondary';
+    return 'default';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -56,11 +158,6 @@ export const Dashboard = () => {
             <div>
               <p className="font-medium">{profile?.full_name}</p>
               <p className="text-sm text-muted-foreground">{profile?.phone}</p>
-              {profile?.management_units && (
-                <p className="text-sm text-muted-foreground">
-                  {profile.management_units.name} - {profile.management_units.cities.name}/{profile.management_units.cities.states.code}
-                </p>
-              )}
             </div>
             <Badge variant="secondary">
               {profile?.role === 'admin' && 'Administrador'}
@@ -73,23 +170,25 @@ export const Dashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
+        {dashboardStats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <Icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stat.description}
-                </p>
-              </CardContent>
-            </Card>
+            <Link key={stat.title} to={stat.href}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
+                  <Icon className={`h-4 w-4 ${stat.color}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stat.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           );
         })}
       </div>
@@ -98,81 +197,139 @@ export const Dashboard = () => {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Atividade Recente</CardTitle>
-            <CardDescription>
-              Últimas ações no sistema
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Cestas Recentes</CardTitle>
+                <CardDescription>
+                  Últimas cestas criadas
+                </CardDescription>
+              </div>
+              <Link to="/baskets">
+                <Button variant="outline" size="sm">
+                  <Eye className="h-4 w-4 mr-2" />
+                  Ver Todas
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    Nova cesta criada: "Medicamentos Q1 2024"
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Há 2 horas
-                  </p>
-                </div>
+            {recentBaskets.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Nenhuma cesta encontrada
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {recentBaskets.map((basket) => (
+                  <div key={basket.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium leading-none">
+                        {basket.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {format(new Date(basket.reference_date), "dd/MM/yyyy", { locale: ptBR })}
+                      </p>
+                    </div>
+                    <Badge variant={basket.is_finalized ? "default" : "secondary"}>
+                      {basket.is_finalized ? "Finalizada" : "Em andamento"}
+                    </Badge>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center">
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    Cotação respondida por Fornecedor XYZ
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Há 4 horas
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    Relatório de preços gerado
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Ontem
-                  </p>
-                </div>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Próximos Vencimentos</CardTitle>
-            <CardDescription>
-              Cotações que vencem em breve
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Cotações Pendentes</CardTitle>
+                <CardDescription>
+                  Cotações que vencem em breve
+                </CardDescription>
+              </div>
+              <Link to="/quotations">
+                <Button variant="outline" size="sm">
+                  <Eye className="h-4 w-4 mr-2" />
+                  Ver Todas
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">Cesta Material Escritório</p>
-                  <p className="text-sm text-muted-foreground">15 fornecedores</p>
-                </div>
-                <Badge variant="destructive">2 dias</Badge>
+            {pendingQuotations.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Nenhuma cotação pendente
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {pendingQuotations.map((quotation) => {
+                  const daysUntilDue = getDaysUntilDue(quotation.due_date);
+                  return (
+                    <div key={quotation.id} className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">{quotation.basket?.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {quotation.supplier?.company_name}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {daysUntilDue < 0 && <AlertCircle className="h-4 w-4 text-red-500" />}
+                        <Badge variant={getBadgeVariant(daysUntilDue)}>
+                          {daysUntilDue < 0 
+                            ? `${Math.abs(daysUntilDue)} dias atraso`
+                            : daysUntilDue === 0 
+                              ? "Hoje" 
+                              : `${daysUntilDue} dias`
+                          }
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">Cesta Material Limpeza</p>
-                  <p className="text-sm text-muted-foreground">8 fornecedores</p>
-                </div>
-                <Badge variant="secondary">5 dias</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">Cesta Combustíveis</p>
-                  <p className="text-sm text-muted-foreground">3 fornecedores</p>
-                </div>
-                <Badge variant="secondary">1 semana</Badge>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Ações Rápidas</CardTitle>
+          <CardDescription>
+            Acesso rápido às principais funcionalidades
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4">
+            <Link to="/baskets">
+              <Button variant="outline">
+                <ShoppingBasket className="h-4 w-4 mr-2" />
+                Nova Cesta de Preços
+              </Button>
+            </Link>
+            <Link to="/quotations">
+              <Button variant="outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Enviar Cotação
+              </Button>
+            </Link>
+            <Link to="/suppliers">
+              <Button variant="outline">
+                <Users className="h-4 w-4 mr-2" />
+                Cadastrar Fornecedor
+              </Button>
+            </Link>
+            <Link to="/products">
+              <Button variant="outline">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Cadastrar Produto
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
