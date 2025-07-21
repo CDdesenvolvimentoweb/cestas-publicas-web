@@ -68,9 +68,17 @@ export const Sidebar = ({ isOpen }: SidebarProps) => {
   const location = useLocation();
   const { profile } = useAuth();
 
-  const filteredItems = navigationItems.filter(item =>
-    profile?.role && item.roles.includes(profile.role)
-  );
+  // Debug: Vamos ver o que está acontecendo
+  console.log('Sidebar - Profile:', profile);
+  console.log('Sidebar - Profile role:', profile?.role);
+
+  const filteredItems = navigationItems.filter(item => {
+    const hasAccess = profile?.role && item.roles.includes(profile.role);
+    console.log(`Item ${item.title}: has access = ${hasAccess}`);
+    return hasAccess;
+  });
+
+  console.log('Filtered items:', filteredItems);
 
   return (
     <div className={cn(
