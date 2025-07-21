@@ -19,7 +19,11 @@ import {
   Trash2, 
   Edit,
   FileCheck,
-  Send
+  Send,
+  BarChart3,
+  TrendingUp,
+  Hash,
+  Layers
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,6 +56,13 @@ interface BasketDetailsProps {
   onUpdate: () => void;
 }
 
+interface BasketStats {
+  total_items: number;
+  total_quantity: number;
+  unique_categories: number;
+  unique_suppliers: number;
+}
+
 export const BasketDetails = ({
   basket,
   isOpen,
@@ -59,7 +70,9 @@ export const BasketDetails = ({
   onUpdate,
 }: BasketDetailsProps) => {
   const [items, setItems] = useState<BasketItem[]>([]);
+  const [stats, setStats] = useState<BasketStats | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingStats, setLoadingStats] = useState(false);
   const [isItemFormOpen, setIsItemFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<BasketItem | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -68,6 +81,7 @@ export const BasketDetails = ({
   useEffect(() => {
     if (basket?.id) {
       fetchBasketItems();
+      fetchBasketStats();
     }
   }, [basket?.id]);
 
@@ -109,6 +123,26 @@ export const BasketDetails = ({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBasketStats = async () => {
+    if (!basket?.id) return;
+
+    setLoadingStats(true);
+    try {
+      const { data, error } = await supabase.rpc('calculate_basket_statistics', {
+        basket_id_param: basket.id
+      });
+
+      if (error) throw error;
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        setStats(data as unknown as BasketStats);
+      }
+    } catch (error: any) {
+      console.error('Error fetching basket stats:', error);
+    } finally {
+      setLoadingStats(false);
     }
   };
 
@@ -176,6 +210,7 @@ export const BasketDetails = ({
     setIsItemFormOpen(false);
     setEditingItem(null);
     fetchBasketItems();
+    fetchBasketStats();
     onUpdate();
   };
 
@@ -219,8 +254,9 @@ export const BasketDetails = ({
         </DialogHeader>
 
         <Tabs defaultValue="items" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="items">Itens ({items.length})</TabsTrigger>
+            <TabsTrigger value="stats">Estatísticas</TabsTrigger>
             <TabsTrigger value="info">Informações</TabsTrigger>
           </TabsList>
 
@@ -325,6 +361,83 @@ export const BasketDetails = ({
                 </Button>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="stats" className="space-y-4">
+            <div className="grid gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    Estatísticas da Cesta
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {loadingStats ? (
+                    <div className="space-y-4">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-muted rounded-lg animate-pulse"></div>
+                          <div className="space-y-2 flex-1">
+                            <div className="h-4 bg-muted rounded w-1/3 animate-pulse"></div>
+                            <div className="h-3 bg-muted rounded w-1/4 animate-pulse"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : stats ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <Package className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Total de Itens</p>
+                          <p className="text-2xl font-bold">{stats.total_items}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                          <Hash className="w-5 h-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Quantidade Total</p>
+                          <p className="text-2xl font-bold">{Number(stats.total_quantity).toFixed(2)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                          <Layers className="w-5 h-5 text-green-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Categorias Únicas</p>
+                          <p className="text-2xl font-bold">{stats.unique_categories}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                          <Users className="w-5 h-5 text-orange-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">Fornecedores</p>
+                          <p className="text-2xl font-bold">{stats.unique_suppliers}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        Estatísticas não disponíveis
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="info" className="space-y-4">

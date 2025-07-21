@@ -108,46 +108,13 @@ export const PriceBaskets = () => {
 
   const handleDuplicateBasket = async (basket: PriceBasket) => {
     try {
-      // Create new basket
-      const { data: newBasket, error: basketError } = await supabase
-        .from('price_baskets')
-        .insert({
-          name: `${basket.name} (Cópia)`,
-          description: basket.description,
-          reference_date: new Date().toISOString().split('T')[0],
-          calculation_type: basket.calculation_type,
-          is_finalized: false,
-          management_unit_id: profile?.management_unit_id,
-          created_by: profile?.id,
-        })
-        .select()
-        .single();
+      const { data: newBasketId, error } = await supabase.rpc('duplicate_basket', {
+        source_basket_id: basket.id,
+        new_name: `${basket.name} (Cópia)`,
+        new_description: `Cópia da cesta: ${basket.description || ''}`
+      });
 
-      if (basketError) throw basketError;
-
-      // Copy basket items
-      const { data: originalItems, error: itemsError } = await supabase
-        .from('basket_items')
-        .select('*')
-        .eq('basket_id', basket.id);
-
-      if (itemsError) throw itemsError;
-
-      if (originalItems && originalItems.length > 0) {
-        const newItems = originalItems.map(item => ({
-          basket_id: newBasket.id,
-          product_id: item.product_id,
-          quantity: item.quantity,
-          lot_number: item.lot_number,
-          observations: item.observations,
-        }));
-
-        const { error: insertError } = await supabase
-          .from('basket_items')
-          .insert(newItems);
-
-        if (insertError) throw insertError;
-      }
+      if (error) throw error;
 
       toast({
         title: "Cesta duplicada",

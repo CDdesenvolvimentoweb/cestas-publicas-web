@@ -977,6 +977,10 @@ export type Database = {
         Args: { request_id: string; admin_response_param?: string }
         Returns: string
       }
+      calculate_basket_statistics: {
+        Args: { basket_id_param: string }
+        Returns: Json
+      }
       check_product_duplication: {
         Args: {
           product_name_param: string
@@ -988,6 +992,14 @@ export type Database = {
       }
       create_quote_token: {
         Args: { quote_uuid: string }
+        Returns: string
+      }
+      duplicate_basket: {
+        Args: {
+          source_basket_id: string
+          new_name: string
+          new_description?: string
+        }
         Returns: string
       }
       generate_quote_token: {
@@ -1005,6 +1017,17 @@ export type Database = {
       get_management_unit_stats: {
         Args: { unit_id: string }
         Returns: Json
+      }
+      get_popular_basket_products: {
+        Args: { management_unit_id_param?: string; limit_param?: number }
+        Returns: {
+          product_id: string
+          product_name: string
+          product_code: string
+          category_name: string
+          usage_count: number
+          avg_quantity: number
+        }[]
       }
       is_valid_management_unit: {
         Args: { unit_id: string }
@@ -1025,6 +1048,10 @@ export type Database = {
           measurement_unit: string
           similarity_score: number
         }[]
+      }
+      validate_basket_finalization: {
+        Args: { basket_id_param: string }
+        Returns: Json
       }
     }
     Enums: {
