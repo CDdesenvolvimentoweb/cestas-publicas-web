@@ -171,6 +171,45 @@ export type Database = {
           },
         ]
       }
+      cmed_products: {
+        Row: {
+          apresentacao_descricao: string
+          created_at: string | null
+          data_atualizacao: string
+          id: string
+          preco_maximo_consumidor: number | null
+          preco_maximo_governo: number | null
+          principio_ativo: string
+          produto_descricao: string
+          registro_anvisa: string
+          updated_at: string | null
+        }
+        Insert: {
+          apresentacao_descricao: string
+          created_at?: string | null
+          data_atualizacao: string
+          id?: string
+          preco_maximo_consumidor?: number | null
+          preco_maximo_governo?: number | null
+          principio_ativo: string
+          produto_descricao: string
+          registro_anvisa: string
+          updated_at?: string | null
+        }
+        Update: {
+          apresentacao_descricao?: string
+          created_at?: string | null
+          data_atualizacao?: string
+          id?: string
+          preco_maximo_consumidor?: number | null
+          preco_maximo_governo?: number | null
+          principio_ativo?: string
+          produto_descricao?: string
+          registro_anvisa?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       external_apis: {
         Row: {
           api_key_required: boolean | null
@@ -198,6 +237,36 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           rate_limit_per_minute?: number | null
+        }
+        Relationships: []
+      }
+      external_price_sources: {
+        Row: {
+          base_url: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync: string | null
+          name: string
+          source_type: string
+        }
+        Insert: {
+          base_url: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name: string
+          source_type: string
+        }
+        Update: {
+          base_url?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name?: string
+          source_type?: string
         }
         Relationships: []
       }
@@ -367,6 +436,100 @@ export type Database = {
         }
         Relationships: []
       }
+      municipal_bid_items: {
+        Row: {
+          bid_id: string | null
+          created_at: string | null
+          id: string
+          item_number: number
+          product_description: string
+          quantity: number | null
+          supplier_cnpj: string | null
+          supplier_name: string | null
+          total_price: number | null
+          unit_measure: string
+          unit_price: number | null
+        }
+        Insert: {
+          bid_id?: string | null
+          created_at?: string | null
+          id?: string
+          item_number: number
+          product_description: string
+          quantity?: number | null
+          supplier_cnpj?: string | null
+          supplier_name?: string | null
+          total_price?: number | null
+          unit_measure: string
+          unit_price?: number | null
+        }
+        Update: {
+          bid_id?: string | null
+          created_at?: string | null
+          id?: string
+          item_number?: number
+          product_description?: string
+          quantity?: number | null
+          supplier_cnpj?: string | null
+          supplier_name?: string | null
+          total_price?: number | null
+          unit_measure?: string
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "municipal_bid_items_bid_id_fkey"
+            columns: ["bid_id"]
+            isOneToOne: false
+            referencedRelation: "municipal_bids"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      municipal_bids: {
+        Row: {
+          bid_number: string
+          bid_year: number
+          created_at: string | null
+          homologation_date: string | null
+          id: string
+          management_unit_id: string | null
+          modality: string
+          object_description: string
+          total_value: number | null
+        }
+        Insert: {
+          bid_number: string
+          bid_year: number
+          created_at?: string | null
+          homologation_date?: string | null
+          id?: string
+          management_unit_id?: string | null
+          modality: string
+          object_description: string
+          total_value?: number | null
+        }
+        Update: {
+          bid_number?: string
+          bid_year?: number
+          created_at?: string | null
+          homologation_date?: string | null
+          id?: string
+          management_unit_id?: string | null
+          modality?: string
+          object_description?: string
+          total_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "municipal_bids_management_unit_id_fkey"
+            columns: ["management_unit_id"]
+            isOneToOne: false
+            referencedRelation: "management_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           created_at: string | null
@@ -438,6 +601,63 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      price_analysis: {
+        Row: {
+          analyzed_at: string | null
+          analyzed_by: string | null
+          basket_id: string | null
+          basket_item_id: string | null
+          created_at: string | null
+          exclusion_reason: string | null
+          id: string
+          is_excluded_from_average: boolean | null
+          original_price: number
+          price_deviation_percentage: number | null
+          price_source: string
+        }
+        Insert: {
+          analyzed_at?: string | null
+          analyzed_by?: string | null
+          basket_id?: string | null
+          basket_item_id?: string | null
+          created_at?: string | null
+          exclusion_reason?: string | null
+          id?: string
+          is_excluded_from_average?: boolean | null
+          original_price: number
+          price_deviation_percentage?: number | null
+          price_source: string
+        }
+        Update: {
+          analyzed_at?: string | null
+          analyzed_by?: string | null
+          basket_id?: string | null
+          basket_item_id?: string | null
+          created_at?: string | null
+          exclusion_reason?: string | null
+          id?: string
+          is_excluded_from_average?: boolean | null
+          original_price?: number
+          price_deviation_percentage?: number | null
+          price_source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_analysis_basket_id_fkey"
+            columns: ["basket_id"]
+            isOneToOne: false
+            referencedRelation: "price_baskets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_analysis_basket_item_id_fkey"
+            columns: ["basket_item_id"]
+            isOneToOne: false
+            referencedRelation: "basket_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_baskets: {
         Row: {
@@ -530,6 +750,50 @@ export type Database = {
             columns: ["index_id"]
             isOneToOne: false
             referencedRelation: "monetary_indexes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_deviation_alerts: {
+        Row: {
+          alert_type: string
+          basket_id: string | null
+          created_at: string | null
+          deviation_percentage: number | null
+          id: string
+          is_resolved: boolean | null
+          item_description: string
+          message: string
+          threshold_percentage: number | null
+        }
+        Insert: {
+          alert_type: string
+          basket_id?: string | null
+          created_at?: string | null
+          deviation_percentage?: number | null
+          id?: string
+          is_resolved?: boolean | null
+          item_description: string
+          message: string
+          threshold_percentage?: number | null
+        }
+        Update: {
+          alert_type?: string
+          basket_id?: string | null
+          created_at?: string | null
+          deviation_percentage?: number | null
+          id?: string
+          is_resolved?: boolean | null
+          item_description?: string
+          message?: string
+          threshold_percentage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_deviation_alerts_basket_id_fkey"
+            columns: ["basket_id"]
+            isOneToOne: false
+            referencedRelation: "price_baskets"
             referencedColumns: ["id"]
           },
         ]
@@ -637,6 +901,50 @@ export type Database = {
           url?: string | null
         }
         Relationships: []
+      }
+      price_supporting_documents: {
+        Row: {
+          created_at: string | null
+          document_content: string | null
+          document_type: string
+          document_url: string | null
+          file_name: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          price_analysis_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_content?: string | null
+          document_type: string
+          document_url?: string | null
+          file_name: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          price_analysis_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_content?: string | null
+          document_type?: string
+          document_url?: string | null
+          file_name?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          price_analysis_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_supporting_documents_price_analysis_id_fkey"
+            columns: ["price_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "price_analysis"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_categories: {
         Row: {
@@ -913,6 +1221,33 @@ export type Database = {
           },
         ]
       }
+      regional_cities: {
+        Row: {
+          created_at: string | null
+          ibge_code: string | null
+          id: string
+          is_regional: boolean | null
+          name: string
+          state_code: string
+        }
+        Insert: {
+          created_at?: string | null
+          ibge_code?: string | null
+          id?: string
+          is_regional?: boolean | null
+          name: string
+          state_code?: string
+        }
+        Update: {
+          created_at?: string | null
+          ibge_code?: string | null
+          id?: string
+          is_regional?: boolean | null
+          name?: string
+          state_code?: string
+        }
+        Relationships: []
+      }
       regions: {
         Row: {
           created_at: string | null
@@ -1138,12 +1473,29 @@ export type Database = {
           quote_count: number
         }[]
       }
+      apply_monetary_correction: {
+        Args: {
+          original_value: number
+          base_date: string
+          target_date: string
+          index_type?: string
+        }
+        Returns: number
+      }
       approve_product_request: {
         Args: { request_id: string; admin_response_param?: string }
         Returns: string
       }
+      auto_search_common_object_prices: {
+        Args: { product_id_param: string }
+        Returns: Json
+      }
       calculate_basket_statistics: {
         Args: { basket_id_param: string }
+        Returns: Json
+      }
+      calculate_bps_weighted_average: {
+        Args: { codigo_br_param: string }
         Returns: Json
       }
       calculate_supplier_ranking: {
