@@ -28,69 +28,39 @@ const navigationItems = [
   },
   {
     title: 'Cestas de Preços',
-    href: '/baskets',
+    href: '/app/baskets',
     icon: ShoppingBasket,
     roles: ['admin', 'servidor'],
   },
   {
     title: 'Produtos',
-    href: '/products',
+    href: '/app/products',
     icon: Package,
     roles: ['admin', 'servidor'],
   },
   {
     title: 'Categorias',
-    href: '/product-categories',
+    href: '/app/product-categories',
     icon: Database,
     roles: ['admin', 'servidor'],
   },
   {
     title: 'Fornecedores',
-    href: '/suppliers',
+    href: '/app/suppliers',
     icon: Building2,
     roles: ['admin', 'servidor'],
   },
   {
     title: 'Cotações',
-    href: '/quotations',
+    href: '/app/quotations',
     icon: FileText,
     roles: ['admin', 'servidor', 'fornecedor'],
   },
   {
-    title: 'Preços de Mercado',
-    href: '/market-prices',
-    icon: TrendingUp,
-    roles: ['admin', 'servidor'],
-  },
-  {
-    title: 'Usuários',
-    href: '/users',
-    icon: Users,
-    roles: ['admin'],
-  },
-  {
     title: 'Unidades Gestoras',
-    href: '/management-units',
+    href: '/app/management-units',
     icon: Building2,
     roles: ['admin'],
-  },
-  {
-    title: 'Relatórios',
-    href: '/reports',
-    icon: FileText,
-    roles: ['admin', 'servidor'],
-  },
-  {
-    title: 'Dados Externos',
-    href: '/external-data',
-    icon: Database,
-    roles: ['admin'],
-  },
-  {
-    title: 'Configurações',
-    href: '/settings',
-    icon: Settings,
-    roles: ['admin', 'servidor'],
   },
 ];
 
@@ -104,13 +74,13 @@ export const Sidebar = ({ isOpen }: SidebarProps) => {
 
   return (
     <div className={cn(
-      "fixed left-0 top-0 h-full bg-sidebar border-r border-sidebar-border transition-all duration-300 z-10",
+      "fixed left-0 top-0 h-full bg-card border-r border-border transition-all duration-300 z-10",
       isOpen ? "w-64" : "w-0 overflow-hidden"
     )}>
       <div className="p-6">
         <div className="flex items-center space-x-2 mb-8">
-          <Calculator className="h-8 w-8 text-sidebar-primary" />
-          <h2 className="text-xl font-bold text-sidebar-foreground">
+          <Calculator className="h-8 w-8 text-primary" />
+          <h2 className="text-xl font-bold text-foreground">
             Cestas Preços
           </h2>
         </div>
@@ -125,8 +95,8 @@ export const Sidebar = ({ isOpen }: SidebarProps) => {
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
                   className={cn(
-                    "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    isActive && "bg-sidebar-accent text-sidebar-accent-foreground"
+                    "w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground",
+                    isActive && "bg-accent text-accent-foreground"
                   )}
                 >
                   <Icon className="mr-3 h-4 w-4" />
