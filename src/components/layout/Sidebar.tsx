@@ -52,7 +52,7 @@ const navigationItems = [
   },
   {
     title: 'Cotações',
-    href: '/quotes',
+    href: '/quotations',
     icon: FileText,
     roles: ['admin', 'servidor', 'fornecedor'],
   },

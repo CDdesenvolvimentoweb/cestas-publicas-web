@@ -29,6 +29,8 @@ export const QuotationComparison = ({ basketId, onClose }: QuotationComparisonPr
   }, [basketId]);
 
   const fetchComparisons = async () => {
+    if (!basketId) return;
+    
     try {
       setLoading(true);
       
@@ -46,7 +48,7 @@ export const QuotationComparison = ({ basketId, onClose }: QuotationComparisonPr
             )
           )
         `)
-        .eq('basket_id', basketId)
+        .eq('basket_id', basketId as string)
         .eq('status', 'respondida');
 
       if (!quotes) return;
@@ -54,7 +56,7 @@ export const QuotationComparison = ({ basketId, onClose }: QuotationComparisonPr
       // Calculate totals and build comparison data
       const comparisonData = quotes.map(quote => {
         const total = quote.quote_items?.reduce((sum, item) => 
-          sum + (parseFloat(item.total_price) || 0), 0) || 0;
+          sum + (Number(item.total_price) || 0), 0) || 0;
         
         return {
           ...quote,

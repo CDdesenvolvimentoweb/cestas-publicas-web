@@ -94,13 +94,51 @@ export const Quotations = () => {
 
   const sendQuotation = async (quotationId) => {
     try {
-      // Here we would call an edge function to send the email
-      // For now, just update the status
+      // Generate token for the quotation
+      const { data: tokenData, error: tokenError } = await supabase
+        .rpc('create_quote_token', { quote_uuid: quotationId });
+
+      if (tokenError) throw tokenError;
+
+      // Get quotation details for email
+      const { data: quotation } = await supabase
+        .from('supplier_quotes')
+        .select(`
+          *,
+          basket:price_baskets(name),
+          supplier:suppliers(company_name, email)
+        `)
+        .eq('id', quotationId)
+        .single();
+
+      if (!quotation) throw new Error('Cotação não encontrada');
+
+      // Call edge function to send email
+      const response = await fetch('/functions/v1/send-quotation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvcnRwc3F2Y2p2bWJobnRub3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTE2OTksImV4cCI6MjA2ODY4NzY5OX0.HK-GsVokxMKd5osHeCa-22l3Ot7P3rP7KZzfcRSQHEI`,
+        },
+        body: JSON.stringify({
+          quotationId,
+          supplierEmail: quotation.supplier.email,
+          supplierName: quotation.supplier.company_name,
+          basketName: quotation.basket.name,
+          dueDate: quotation.due_date,
+          token: tokenData,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Erro ao enviar e-mail');
+
+      // Update quotation status
       const { error } = await supabase
         .from('supplier_quotes')
         .update({ 
           status: 'pendente' as const,
-          sent_at: new Date().toISOString()
+          sent_at: new Date().toISOString(),
+          access_token: tokenData
         })
         .eq('id', quotationId);
 
@@ -113,6 +151,7 @@ export const Quotations = () => {
       
       fetchData();
     } catch (error) {
+      console.error('Error sending quotation:', error);
       toast({
         title: "Erro",
         description: "Erro ao enviar cotação",
