@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,7 @@ import { Loader2, Calculator } from 'lucide-react';
 export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,6 +36,8 @@ export const Login = () => {
         title: "Login realizado com sucesso!",
         description: "Bem-vindo ao sistema de cestas de preços.",
       });
+      // Redirecionar para o dashboard após login bem-sucedido
+      navigate('/dashboard');
     }
 
     setIsLoading(false);
