@@ -156,15 +156,18 @@ export const ManagementUnitForm = ({
 
   const fetchCitiesByState = async (stateId: string) => {
     try {
+      console.log('Buscando cidades do estado:', stateId);
       const { data, error } = await supabase
         .from('cities')
         .select('id, name, state_id')
         .eq('state_id', stateId)
         .order('name');
 
+      console.log('Resultado da busca de cidades:', { data, error });
       if (error) throw error;
       setCities(data || []);
     } catch (error: any) {
+      console.error('Erro ao carregar cidades:', error);
       toast({
         variant: "destructive",
         title: "Erro ao carregar cidades",

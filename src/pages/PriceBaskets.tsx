@@ -51,28 +51,41 @@ export const PriceBaskets = () => {
           calculation_type,
           is_finalized,
           created_at,
+          created_by,
           management_units (
             name
-          ),
-          profiles (
-            full_name
           )
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Get item counts for each basket
+      // Get item counts and creator info for each basket
       const basketsWithCounts = await Promise.all(
         (data || []).map(async (basket: any) => {
           const { count } = await supabase
             .from('basket_items')
             .select('*', { count: 'exact', head: true })
             .eq('basket_id', basket.id);
+
+          // Get creator profile info
+          let creatorName = 'N/A';
+          if (basket.created_by) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', basket.created_by)
+              .single();
+            
+            if (profile) {
+              creatorName = profile.full_name;
+            }
+          }
           
           return {
             ...basket,
             basket_items_count: count || 0,
+            profiles: { full_name: creatorName },
           } as PriceBasket;
         })
       );
