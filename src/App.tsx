@@ -13,9 +13,11 @@ import Products from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
 import { Quotations } from "@/pages/Quotations";
 import { SupplierQuote } from "@/pages/SupplierQuote";
+import { SupplierPortal } from "@/pages/SupplierPortal";
 import { UnitDashboard } from "@/pages/UnitDashboard";
 import { UserManagement } from "@/pages/UserManagement";
 import { Login } from "@/pages/Login";
+import Reports from "@/pages/Reports";
 import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
 
@@ -32,6 +34,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/supplier-quote" element={<SupplierQuote />} />
+          <Route path="/supplier-portal/:token" element={<SupplierPortal />} />
           
           {/* Protected routes */}
           <Route path="/dashboard" element={
@@ -53,6 +56,7 @@ const App = () => (
             <Route path="products" element={<Products />} />
             <Route path="baskets" element={<PriceBaskets />} />
             <Route path="quotations" element={<Quotations />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="unit-dashboard" element={<UnitDashboard />} />
           </Route>

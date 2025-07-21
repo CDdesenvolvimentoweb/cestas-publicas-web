@@ -13,6 +13,7 @@ import {
   BarChart3,
   Database,
   TrendingUp,
+  Download,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -55,6 +56,12 @@ const navigationItems = [
     href: '/app/quotations',
     icon: FileText,
     roles: ['admin', 'servidor', 'fornecedor'],
+  },
+  {
+    title: 'Relatórios',
+    href: '/app/reports',
+    icon: Download,
+    roles: ['admin', 'servidor'],
   },
   {
     title: 'Unidades Gestoras',
