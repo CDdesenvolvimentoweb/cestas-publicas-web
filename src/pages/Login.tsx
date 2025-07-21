@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { signIn, signUp } from '@/lib/auth';
+import { CreateAdminUser } from '@/components/temp/CreateAdminUser';
 import { Loader2, Calculator } from 'lucide-react';
 
 export const Login = () => {
@@ -193,6 +194,11 @@ export const Login = () => {
           </Tabs>
         </CardContent>
       </Card>
+      
+      {/* Componente temporário para criar admin */}
+      <div className="mt-8">
+        <CreateAdminUser />
+      </div>
     </div>
   );
 };
