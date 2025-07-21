@@ -981,6 +981,20 @@ export type Database = {
         Args: { basket_id_param: string }
         Returns: Json
       }
+      calculate_supplier_ranking: {
+        Args: { management_unit_id_param?: string; days_back?: number }
+        Returns: {
+          supplier_id: string
+          supplier_name: string
+          total_quotes: number
+          responded_quotes: number
+          response_rate: number
+          avg_response_time_hours: number
+          total_value: number
+          avg_discount_percentage: number
+          ranking_score: number
+        }[]
+      }
       check_product_duplication: {
         Args: {
           product_name_param: string
@@ -1001,6 +1015,10 @@ export type Database = {
           new_description?: string
         }
         Returns: string
+      }
+      generate_quotation_report: {
+        Args: { basket_id_param: string }
+        Returns: Json
       }
       generate_quote_token: {
         Args: Record<PropertyKey, never>
@@ -1049,9 +1067,25 @@ export type Database = {
           similarity_score: number
         }[]
       }
+      send_quotation_batch: {
+        Args: {
+          basket_id_param: string
+          supplier_ids: string[]
+          due_date_param: string
+        }
+        Returns: Json
+      }
       validate_basket_finalization: {
         Args: { basket_id_param: string }
         Returns: Json
+      }
+      validate_digital_signature: {
+        Args: {
+          quote_id_param: string
+          signature_data: string
+          certificate_data: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

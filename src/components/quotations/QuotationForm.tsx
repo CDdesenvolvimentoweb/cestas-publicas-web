@@ -49,36 +49,41 @@ export const QuotationForm = ({ baskets, suppliers, onSuccess }: QuotationFormPr
     setLoading(true);
 
     try {
-      // Create quotations for each selected supplier
-      const quotationPromises = selectedSuppliers.map(supplierId => 
-        supabase
-          .from('supplier_quotes')
-          .insert({
-            basket_id: selectedBasket,
-            supplier_id: supplierId,
-            due_date: dueDate.toISOString(),
-            status: 'pendente'
-          })
-      );
+      // Use the new send_quotation_batch function
+      const { data, error } = await supabase
+        .rpc('send_quotation_batch', {
+          basket_id_param: selectedBasket,
+          supplier_ids: selectedSuppliers,
+          due_date_param: dueDate.toISOString()
+        });
 
-      const results = await Promise.all(quotationPromises);
-      
-      // Check for any errors
-      const hasError = results.some(result => result.error);
-      if (hasError) {
-        throw new Error("Erro ao criar algumas cotações");
+      if (error) throw error;
+
+      const result = data as {
+        success_count: number;
+        error_count: number;
+        errors: string[];
+        total_processed: number;
+      };
+
+      if (result.error_count > 0) {
+        toast({
+          title: "Atenção",
+          description: `${result.success_count} cotações criadas, ${result.error_count} com erro`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Sucesso",
+          description: `${result.success_count} cotação(ões) criada(s) com sucesso`,
+        });
       }
-
-      toast({
-        title: "Sucesso",
-        description: `${selectedSuppliers.length} cotação(ões) criada(s) com sucesso`,
-      });
       
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Erro",
-        description: "Erro ao criar cotações",
+        description: error.message || "Erro ao criar cotações",
         variant: "destructive",
       });
     } finally {

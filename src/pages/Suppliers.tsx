@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Search, Building2, Mail, Phone, MapPin } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Building2, Mail, Phone, MapPin, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { SupplierForm } from '@/components/suppliers/SupplierForm';
+import { SupplierRanking } from '@/components/suppliers/SupplierRanking';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 interface Supplier {
@@ -163,6 +165,17 @@ export const Suppliers = () => {
         </Button>
       </div>
 
+      <Tabs defaultValue="suppliers" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="suppliers">Lista de Fornecedores</TabsTrigger>
+          <TabsTrigger value="ranking">
+            <Award className="mr-2 h-4 w-4" />
+            Ranking
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="suppliers" className="space-y-6">
+
       <div className="flex gap-4 items-center">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -263,6 +276,12 @@ export const Suppliers = () => {
           ))}
         </div>
       )}
+        </TabsContent>
+
+        <TabsContent value="ranking">
+          <SupplierRanking />
+        </TabsContent>
+      </Tabs>
 
       <SupplierForm
         isOpen={isFormOpen}

@@ -87,12 +87,39 @@ export const QuotationComparison = ({ basketId, onClose }: QuotationComparisonPr
     }
   };
 
-  const exportComparison = () => {
-    // Here we would implement export functionality
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "Exportação será implementada em breve",
-    });
+  const exportComparison = async () => {
+    if (!basketId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('generate_quotation_report', {
+          basket_id_param: basketId
+        });
+
+      if (error) throw error;
+
+      // Create downloadable file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio-cotacoes-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Relatório exportado",
+        description: "O relatório foi baixado com sucesso",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao gerar relatório: " + error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const findBestPrice = (itemName: string) => {
