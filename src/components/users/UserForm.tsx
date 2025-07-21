@@ -13,6 +13,7 @@ import { Loader2 } from 'lucide-react';
 
 const userSchema = z.object({
   email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   full_name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   cpf: z.string().optional(),
   phone: z.string().optional(),
@@ -42,6 +43,7 @@ export const UserForm = ({ onSuccess }: UserFormProps) => {
     resolver: zodResolver(userSchema),
     defaultValues: {
       email: '',
+      password: '',
       full_name: '',
       cpf: '',
       phone: '',
@@ -87,6 +89,7 @@ export const UserForm = ({ onSuccess }: UserFormProps) => {
       const { data: result, error: createError } = await supabase.functions.invoke('create-user', {
         body: {
           email: data.email,
+          password: data.password,
           full_name: data.full_name,
           cpf: data.cpf,
           phone: data.phone,
@@ -127,6 +130,20 @@ export const UserForm = ({ onSuccess }: UserFormProps) => {
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input {...field} type="email" placeholder="usuario@exemplo.com" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Senha</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" placeholder="Mínimo 6 caracteres" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

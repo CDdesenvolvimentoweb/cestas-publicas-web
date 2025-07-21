@@ -14,7 +14,7 @@ import { NotificationCenter } from '@/components/notifications/NotificationCente
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 
 export const Dashboard = () => {
-  const { profile } = useAuth();
+  const { profile, user, loading } = useAuth();
   const [stats, setStats] = useState({
     basketsCount: 0,
     quotationsCount: 0,
@@ -23,15 +23,34 @@ export const Dashboard = () => {
   });
   const [recentBaskets, setRecentBaskets] = useState([]);
   const [pendingQuotations, setPendingQuotations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
+
+  // Debug info
+  console.log('🎯 Dashboard render - User:', user?.id, 'Profile:', profile, 'Loading:', loading);
 
   useEffect(() => {
+    // Teste de conexão com Supabase
+    const testSupabaseConnection = async () => {
+      console.log('🧪 Testando conexão com Supabase...');
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, role')
+          .limit(1);
+        
+        console.log('🧪 Teste de conexão - Data:', data, 'Error:', error);
+      } catch (err) {
+        console.error('🧪 Erro no teste de conexão:', err);
+      }
+    };
+    
+    testSupabaseConnection();
     fetchDashboardData();
   }, []);
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
+      setDashboardLoading(true);
 
       // Fetch stats
       const [basketsResult, quotationsResult, suppliersResult, productsResult] = await Promise.all([
@@ -80,7 +99,7 @@ export const Dashboard = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setDashboardLoading(false);
     }
   };
 
@@ -134,7 +153,7 @@ export const Dashboard = () => {
     return 'default';
   };
 
-  if (loading) {
+  if (dashboardLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -147,8 +166,14 @@ export const Dashboard = () => {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
         <p className="text-muted-foreground">
-          Bem-vindo ao sistema de formação de cestas de preços, {profile?.full_name}
+          Bem-vindo ao sistema de formação de cestas de preços, {profile?.full_name || 'Usuário'}
         </p>
+        {/* Debug info */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-2 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs">
+            <strong>Debug:</strong> User ID: {user?.id} | Profile: {profile ? `${profile.full_name} (${profile.role})` : 'null'} | Loading: {loading ? 'yes' : 'no'}
+          </div>
+        )}
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">

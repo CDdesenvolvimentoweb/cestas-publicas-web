@@ -7,6 +7,7 @@ const corsHeaders = {
 
 interface CreateUserRequest {
   email: string
+  password: string
   full_name: string
   cpf?: string
   phone?: string
@@ -85,13 +86,18 @@ Deno.serve(async (req) => {
     const body: CreateUserRequest = await req.json()
     console.log('Creating user:', { email: body.email, role: body.role })
 
-    // Generate a temporary password
-    const tempPassword = crypto.randomUUID()
+    // Validate password is provided
+    if (!body.password) {
+      return new Response(
+        JSON.stringify({ error: 'Password is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-    // Create user using admin client
+    // Create user using admin client with the provided password
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email: body.email,
-      password: tempPassword,
+      password: body.password,
       email_confirm: true, // Auto-confirm email
       user_metadata: {
         full_name: body.full_name,
@@ -143,19 +149,6 @@ Deno.serve(async (req) => {
 
     console.log('Profile created successfully')
 
-    // Send password reset email so user can set their own password
-    const { error: resetError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'recovery',
-      email: body.email,
-      options: {
-        redirectTo: `${req.headers.get('origin') || 'http://localhost:5173'}/auth?type=recovery`
-      }
-    })
-
-    if (resetError) {
-      console.error('Error sending password reset:', resetError)
-    }
-
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -163,7 +156,7 @@ Deno.serve(async (req) => {
           id: newUser.user.id,
           email: newUser.user.email
         },
-        message: 'Usuário criado com sucesso. Um email de redefinição de senha foi enviado.'
+        message: 'Usuário criado com sucesso!'
       }),
       { 
         status: 200, 

@@ -75,9 +75,8 @@ export const Quotations = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pendente': return 'bg-yellow-100 text-yellow-800';
-      case 'vencida': return 'bg-blue-100 text-blue-800';
-      case 'respondida': return 'bg-green-100 text-green-800';
       case 'vencida': return 'bg-red-100 text-red-800';
+      case 'respondida': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -85,9 +84,8 @@ export const Quotations = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pendente': return <Clock className="h-3 w-3" />;
-      case 'vencida': return <Mail className="h-3 w-3" />;
-      case 'respondida': return <Check className="h-3 w-3" />;
       case 'vencida': return <X className="h-3 w-3" />;
+      case 'respondida': return <Check className="h-3 w-3" />;
       default: return null;
     }
   };

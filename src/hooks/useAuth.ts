@@ -78,13 +78,14 @@ export const useAuth = () => {
       
       if (error) {
         console.error('❌ Erro ao buscar perfil:', error);
-        // Continue with null profile instead of blocking
         setProfile(null);
       } else if (profile) {
         console.log('✅ Perfil carregado:', profile);
         setProfile(profile);
       } else {
-        console.log('⚠️ Nenhum perfil encontrado');
+        console.log('⚠️ Nenhum perfil encontrado - criando perfil básico');
+        // Se não há perfil, ainda assim marcar como carregado
+        // O usuário será redirecionado para completar o perfil
         setProfile(null);
       }
     } catch (error) {

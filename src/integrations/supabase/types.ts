@@ -139,6 +139,69 @@ export type Database = {
           },
         ]
       }
+      catalog_products: {
+        Row: {
+          category_id: string | null
+          code: string
+          created_at: string | null
+          description: string
+          element_code: string | null
+          id: string
+          is_active: boolean | null
+          is_common_object: boolean | null
+          measurement_unit_id: string | null
+          name: string
+          specification: string | null
+          tce_code: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          code: string
+          created_at?: string | null
+          description: string
+          element_code?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_common_object?: boolean | null
+          measurement_unit_id?: string | null
+          name: string
+          specification?: string | null
+          tce_code?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          code?: string
+          created_at?: string | null
+          description?: string
+          element_code?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_common_object?: boolean | null
+          measurement_unit_id?: string | null
+          name?: string
+          specification?: string | null
+          tce_code?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalog_products_measurement_unit_id_fkey"
+            columns: ["measurement_unit_id"]
+            isOneToOne: false
+            referencedRelation: "measurement_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cities: {
         Row: {
           created_at: string | null
@@ -387,25 +450,28 @@ export type Database = {
       }
       measurement_units: {
         Row: {
-          abbreviation: string
           created_at: string | null
           description: string | null
           id: string
+          is_active: boolean | null
           name: string
+          symbol: string
         }
         Insert: {
-          abbreviation: string
           created_at?: string | null
           description?: string | null
           id?: string
+          is_active?: boolean | null
           name: string
+          symbol: string
         }
         Update: {
-          abbreviation?: string
           created_at?: string | null
           description?: string | null
           id?: string
+          is_active?: boolean | null
           name?: string
+          symbol?: string
         }
         Relationships: []
       }
@@ -1062,6 +1128,20 @@ export type Database = {
             columns: ["measurement_unit_id"]
             isOneToOne: false
             referencedRelation: "measurement_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

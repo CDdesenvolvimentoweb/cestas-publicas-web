@@ -22,6 +22,10 @@ interface ProductRequest {
   admin_response?: string;
   created_at: string;
   reviewed_at?: string;
+  requester_id: string;
+  management_unit_id: string;
+  category_id?: string;
+  measurement_unit_id?: string;
   requester: {
     full_name: string;
   };
@@ -33,7 +37,7 @@ interface ProductRequest {
   };
   measurement_units?: {
     name: string;
-    abbreviation: string;
+    symbol: string;
   };
 }
 
@@ -55,18 +59,24 @@ export function ProductRequestsList() {
 
   const fetchRequests = async () => {
     try {
+      // Query simplificada para evitar problemas de relacionamento
       const { data, error } = await supabase
         .from("product_requests")
         .select(`
           *,
-          requester:profiles!product_requests_requester_id_fkey(full_name),
+          requester:profiles(full_name),
           management_units(name),
           product_categories(name),
-          measurement_units(name, abbreviation)
+          measurement_units(name, symbol)
         `)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+      
+      console.log("Requests data:", data);
       setRequests(data as any || []);
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -165,8 +175,8 @@ export function ProductRequestsList() {
   const filteredRequests = requests.filter((request) =>
     request.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     request.product_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    request.requester.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    request.management_units.name.toLowerCase().includes(searchTerm.toLowerCase())
+    request.requester?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    request.management_units?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -236,11 +246,11 @@ export function ProductRequestsList() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Solicitado por:</p>
-                    <p className="font-medium">{request.requester.full_name}</p>
+                    <p className="font-medium">{request.requester?.full_name || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Unidade:</p>
-                    <p className="font-medium">{request.management_units.name}</p>
+                    <p className="font-medium">{request.management_units?.name || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Data:</p>
@@ -302,11 +312,11 @@ export function ProductRequestsList() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Solicitado por:</p>
-                  <p className="font-medium">{selectedRequest.requester.full_name}</p>
+                  <p className="font-medium">{selectedRequest.requester?.full_name || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Unidade:</p>
-                  <p className="font-medium">{selectedRequest.management_units.name}</p>
+                  <p className="font-medium">{selectedRequest.management_units?.name || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Data:</p>

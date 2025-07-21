@@ -72,29 +72,95 @@ export const getCurrentUser = async () => {
 
 export const getUserProfile = async () => {
   try {
+    console.log('🔍 Buscando perfil do usuário...');
+    
+    // Primeiro, obter o usuário atual
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError) {
+      console.error('❌ Erro ao obter usuário:', userError);
+      return { profile: null, error: userError };
+    }
+    
+    if (!user) {
+      console.log('⚠️ Usuário não encontrado');
+      return { profile: null, error: null };
+    }
+    
+    console.log('👤 Usuário encontrado:', user.id, user.email);
+    
+    // Buscar perfil com query simples primeiro
+    console.log('🔍 Fazendo consulta do perfil...');
     const { data: profile, error } = await supabase
       .from('profiles')
       .select(`
-        *,
-        management_units (
-          id,
-          name,
-          cities (
+        id,
+        full_name,
+        cpf,
+        phone,
+        role,
+        management_unit_id,
+        is_active,
+        created_at,
+        updated_at
+      `)
+      .eq('id', user.id)
+      .single(); // Usar single() em vez de maybeSingle()
+    
+    if (error) {
+      console.error('❌ Erro na query do perfil:', error);
+      // Se erro for "PGRST116" (não encontrado), retorna null sem erro
+      if (error.code === 'PGRST116') {
+        console.log('⚠️ Perfil não encontrado (PGRST116) para o usuário:', user.id);
+        return { profile: null, error: null };
+      }
+      return { profile: null, error };
+    }
+    
+    if (profile) {
+      console.log('✅ Perfil encontrado:', profile.full_name, 'Role:', profile.role);
+      
+      // Se tem management_unit_id, buscar os dados da unidade
+      if (profile.management_unit_id) {
+        console.log('🏢 Buscando dados da unidade de gestão...');
+        const { data: managementUnit } = await supabase
+          .from('management_units')
+          .select(`
             id,
             name,
-            states (
+            cities (
               id,
               name,
-              code
+              states (
+                id,
+                name,
+                code
+              )
             )
-          )
-        )
-      `)
-      .maybeSingle(); // Use maybeSingle to avoid errors when no profile found
+          `)
+          .eq('id', profile.management_unit_id)
+          .single();
+        
+        if (managementUnit) {
+          console.log('🏢 Unidade encontrada:', managementUnit.name);
+          return { 
+            profile: { 
+              ...profile, 
+              management_units: managementUnit 
+            }, 
+            error: null 
+          };
+        }
+      }
+      
+      return { profile, error: null };
+    } else {
+      console.log('⚠️ Perfil não encontrado para o usuário:', user.id);
+      return { profile: null, error: null };
+    }
     
-    return { profile, error };
   } catch (error) {
-    console.error('Erro na query getUserProfile:', error);
+    console.error('❌ Erro crítico na query getUserProfile:', error);
     return { profile: null, error };
   }
 };

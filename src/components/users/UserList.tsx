@@ -4,6 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { Loader2, Edit, Trash2 } from 'lucide-react';
 
@@ -37,6 +39,10 @@ export const UserList = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingUsers, setUpdatingUsers] = useState<Set<string>>(new Set());
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -105,6 +111,65 @@ export const UserList = () => {
     }
   };
 
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteUser = (user: User) => {
+    setDeletingUser(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!deletingUser) return;
+
+    try {
+      console.log('🗑️ Iniciando exclusão do usuário:', deletingUser.full_name, deletingUser.id);
+      
+      // Deletar o perfil do usuário (isso deve ser suficiente)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', deletingUser.id);
+
+      if (profileError) {
+        console.error('Erro ao deletar perfil:', profileError);
+        throw profileError;
+      }
+
+      console.log('✅ Perfil deletado com sucesso');
+
+      // Tentar deletar o usuário da autenticação via Edge Function
+      try {
+        const { error: functionError } = await supabase.functions.invoke('delete-user', {
+          body: { user_id: deletingUser.id }
+        });
+
+        if (functionError) {
+          console.warn('Aviso: Não foi possível deletar usuário da auth:', functionError);
+          // Não falha a operação se não conseguir deletar da auth
+        } else {
+          console.log('✅ Usuário deletado da auth com sucesso');
+        }
+      } catch (functionCallError) {
+        console.warn('Edge function delete-user não disponível:', functionCallError);
+        // Continua mesmo se a function não existir
+      }
+
+      // Remove da lista local
+      setUsers(prev => prev.filter(user => user.id !== deletingUser.id));
+      toast.success('Usuário deletado com sucesso');
+      
+    } catch (error) {
+      console.error('Erro ao deletar usuário:', error);
+      toast.error('Erro ao deletar usuário: ' + (error.message || 'Erro desconhecido'));
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeletingUser(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -166,10 +231,19 @@ export const UserList = () => {
               </TableCell>
               <TableCell>
                 <div className="flex items-center space-x-1">
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleEditUser(user)}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-destructive">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-destructive"
+                    onClick={() => handleDeleteUser(user)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -178,6 +252,51 @@ export const UserList = () => {
           ))}
         </TableBody>
       </Table>
+
+      {/* Dialog de Edição */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Usuário</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-4">
+            <p className="text-muted-foreground mb-4">
+              Funcionalidade de edição será implementada em breve.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Por enquanto, você pode ativar/desativar o usuário usando o switch na tabela.
+            </p>
+            <Button 
+              className="mt-4" 
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              Fechar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza de que deseja excluir o usuário <strong>{deletingUser?.full_name}</strong>? 
+              Esta ação não pode ser desfeita e todos os dados associados a este usuário serão perdidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmDeleteUser}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

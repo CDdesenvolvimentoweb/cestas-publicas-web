@@ -91,9 +91,9 @@ const navigationItems = [
 
 export const Sidebar = ({ isOpen }: SidebarProps) => {
   const location = useLocation();
-  const { profile, loading } = useAuth();
+  const { profile, loading, user } = useAuth();
 
-  console.log('🗂️ Sidebar render - Profile:', profile, 'Loading:', loading);
+  console.log('🗂️ Sidebar render - Profile:', profile, 'Loading:', loading, 'User:', user?.id);
 
   const filteredItems = navigationItems.filter(item =>
     profile?.role && item.roles.includes(profile.role)
@@ -123,8 +123,37 @@ export const Sidebar = ({ isOpen }: SidebarProps) => {
     );
   }
 
-  // Se não há perfil ou não há itens filtrados, mostra mensagem
-  if (!profile || filteredItems.length === 0) {
+  // Se não há perfil, mostra mensagem de debug
+  if (!profile) {
+    return (
+      <div className={cn(
+        "fixed left-0 top-0 h-full bg-card border-r border-border transition-all duration-300 z-10",
+        isOpen ? "w-64" : "w-0 overflow-hidden"
+      )}>
+        <div className="p-6">
+          <div className="flex items-center space-x-2 mb-8">
+            <Calculator className="h-8 w-8 text-primary" />
+            <h2 className="text-xl font-bold text-foreground">
+              Cestas Preços
+            </h2>
+          </div>
+          <div className="flex flex-col items-center justify-center py-8 space-y-2">
+            <div className="text-muted-foreground text-sm text-center">
+              Perfil não carregado
+            </div>
+            {user && (
+              <div className="text-xs text-muted-foreground text-center">
+                Usuário: {user.email}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Se não há itens filtrados, mostra mensagem
+  if (filteredItems.length === 0) {
     return (
       <div className={cn(
         "fixed left-0 top-0 h-full bg-card border-r border-border transition-all duration-300 z-10",
@@ -139,7 +168,7 @@ export const Sidebar = ({ isOpen }: SidebarProps) => {
           </div>
           <div className="flex items-center justify-center py-8">
             <div className="text-muted-foreground text-sm text-center">
-              {!profile ? 'Perfil não carregado' : 'Nenhum menu disponível'}
+              Nenhum menu disponível para {profile.role}
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ProductForm } from '@/components/products/ProductForm';
+import { CatalogProductManagement } from '@/components/products/CatalogProductManagement';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,7 +30,7 @@ interface Product {
   };
   measurement_units: {
     name: string;
-    abbreviation: string;
+    symbol: string;
   };
 }
 
@@ -77,7 +78,7 @@ export default function Products() {
           ),
           measurement_units (
             name,
-            abbreviation
+            symbol
           )
         `)
         .order('name');
@@ -224,10 +225,15 @@ export default function Products() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="catalog">Catálogo</TabsTrigger>
           <TabsTrigger value="products">Produtos</TabsTrigger>
-          <TabsTrigger value="requests">Solicitações de Produtos</TabsTrigger>
+          <TabsTrigger value="requests">Solicitações</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="catalog" className="space-y-6">
+          <CatalogProductManagement />
+        </TabsContent>
 
         <TabsContent value="products" className="space-y-6">
 
@@ -338,7 +344,7 @@ export default function Products() {
                     
                     <div className="flex items-center gap-2 text-sm">
                       <Ruler className="w-4 h-4 text-muted-foreground" />
-                      <span>{product.measurement_units.name} ({product.measurement_units.abbreviation})</span>
+                      <span>{product.measurement_units.name} ({product.measurement_units.symbol})</span>
                     </div>
                   </div>
 
