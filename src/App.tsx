@@ -7,6 +7,7 @@ import { AuthLayout } from "@/components/layout/AuthLayout";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Dashboard } from "@/pages/Dashboard";
 import { ManagementUnits } from "@/pages/ManagementUnits";
+import { Suppliers } from "@/pages/Suppliers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="management-units" element={<ManagementUnits />} />
+              <Route path="suppliers" element={<Suppliers />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>

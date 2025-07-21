@@ -32,12 +32,17 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  cnpj: z.string().optional(),
-  address: z.string().optional(),
+  company_name: z.string().min(1, 'Razão social é obrigatória'),
+  trade_name: z.string().optional(),
+  cnpj: z.string().min(1, 'CNPJ é obrigatório'),
+  email: z.string().email('Email inválido'),
   phone: z.string().optional(),
-  email: z.string().email('Email inválido').optional().or(z.literal('')),
-  city_id: z.string().min(1, 'Cidade é obrigatória'),
+  address: z.string().optional(),
+  website: z.string().url('URL inválida').optional().or(z.literal('')),
+  city_id: z.string().optional(),
+  municipal_registration: z.string().optional(),
+  state_registration: z.string().optional(),
+  zip_code: z.string().optional(),
   is_active: z.boolean().default(true),
 });
 
@@ -55,19 +60,19 @@ interface City {
   state_id: string;
 }
 
-interface ManagementUnitFormProps {
+interface SupplierFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  unit?: any;
+  supplier?: any;
 }
 
-export const ManagementUnitForm = ({
+export const SupplierForm = ({
   isOpen,
   onClose,
   onSuccess,
-  unit,
-}: ManagementUnitFormProps) => {
+  supplier,
+}: SupplierFormProps) => {
   const [loading, setLoading] = useState(false);
   const [states, setStates] = useState<State[]>([]);
   const [cities, setCities] = useState<City[]>([]);
@@ -77,12 +82,17 @@ export const ManagementUnitForm = ({
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
+      company_name: '',
+      trade_name: '',
       cnpj: '',
-      address: '',
-      phone: '',
       email: '',
+      phone: '',
+      address: '',
+      website: '',
       city_id: '',
+      municipal_registration: '',
+      state_registration: '',
+      zip_code: '',
       is_active: true,
     },
   });
@@ -90,33 +100,42 @@ export const ManagementUnitForm = ({
   useEffect(() => {
     if (isOpen) {
       fetchStates();
-      if (unit) {
+      if (supplier) {
         form.reset({
-          name: unit.name || '',
-          cnpj: unit.cnpj || '',
-          address: unit.address || '',
-          phone: unit.phone || '',
-          email: unit.email || '',
-          city_id: unit.city_id || '',
-          is_active: unit.is_active ?? true,
+          company_name: supplier.company_name || '',
+          trade_name: supplier.trade_name || '',
+          cnpj: supplier.cnpj || '',
+          email: supplier.email || '',
+          phone: supplier.phone || '',
+          address: supplier.address || '',
+          website: supplier.website || '',
+          city_id: supplier.city_id || '',
+          municipal_registration: supplier.municipal_registration || '',
+          state_registration: supplier.state_registration || '',
+          zip_code: supplier.zip_code || '',
+          is_active: supplier.is_active ?? true,
         });
-        // Se está editando, buscar o estado da cidade atual
-        if (unit.city_id) {
-          fetchStateOfCity(unit.city_id);
+        if (supplier.city_id) {
+          fetchStateOfCity(supplier.city_id);
         }
       } else {
         form.reset({
-          name: '',
+          company_name: '',
+          trade_name: '',
           cnpj: '',
-          address: '',
-          phone: '',
           email: '',
+          phone: '',
+          address: '',
+          website: '',
           city_id: '',
+          municipal_registration: '',
+          state_registration: '',
+          zip_code: '',
           is_active: true,
         });
       }
     }
-  }, [isOpen, unit, form]);
+  }, [isOpen, supplier, form]);
 
   const fetchStates = async () => {
     try {
@@ -188,34 +207,38 @@ export const ManagementUnitForm = ({
       // Convert empty strings to null for optional fields
       const cleanData = {
         ...data,
-        cnpj: data.cnpj || null,
-        address: data.address || null,
+        trade_name: data.trade_name || null,
         phone: data.phone || null,
-        email: data.email || null,
+        address: data.address || null,
+        website: data.website || null,
+        city_id: data.city_id || null,
+        municipal_registration: data.municipal_registration || null,
+        state_registration: data.state_registration || null,
+        zip_code: data.zip_code || null,
       };
 
-      if (unit) {
+      if (supplier) {
         const { error } = await supabase
-          .from('management_units')
+          .from('suppliers')
           .update(cleanData)
-          .eq('id', unit.id);
+          .eq('id', supplier.id);
 
         if (error) throw error;
 
         toast({
-          title: "Unidade gestora atualizada",
+          title: "Fornecedor atualizado",
           description: "As informações foram atualizadas com sucesso.",
         });
       } else {
         const { error } = await supabase
-          .from('management_units')
+          .from('suppliers')
           .insert(cleanData);
 
         if (error) throw error;
 
         toast({
-          title: "Unidade gestora criada",
-          description: "A unidade gestora foi criada com sucesso.",
+          title: "Fornecedor cadastrado",
+          description: "O fornecedor foi cadastrado com sucesso.",
         });
       }
 
@@ -223,7 +246,7 @@ export const ManagementUnitForm = ({
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: unit ? "Erro ao atualizar" : "Erro ao criar",
+        title: supplier ? "Erro ao atualizar" : "Erro ao cadastrar",
         description: error.message,
       });
     } finally {
@@ -233,15 +256,15 @@ export const ManagementUnitForm = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {unit ? 'Editar' : 'Nova'} Unidade Gestora
+            {supplier ? 'Editar' : 'Novo'} Fornecedor
           </DialogTitle>
           <DialogDescription>
-            {unit 
-              ? 'Atualize as informações da unidade gestora.'
-              : 'Preencha os dados para criar uma nova unidade gestora.'
+            {supplier 
+              ? 'Atualize as informações do fornecedor.'
+              : 'Preencha os dados para cadastrar um novo fornecedor.'
             }
           </DialogDescription>
         </DialogHeader>
@@ -251,12 +274,26 @@ export const ManagementUnitForm = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="company_name"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Nome da Unidade *</FormLabel>
+                    <FormLabel>Razão Social *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Secretaria Municipal de Saúde" {...field} />
+                      <Input placeholder="Ex: Empresa ABC Ltda" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="trade_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome Fantasia</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: ABC Materiais" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -268,9 +305,23 @@ export const ManagementUnitForm = ({
                 name="cnpj"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>CNPJ</FormLabel>
+                    <FormLabel>CNPJ *</FormLabel>
                     <FormControl>
                       <Input placeholder="00.000.000/0000-00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="contato@empresa.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -293,12 +344,40 @@ export const ManagementUnitForm = ({
 
               <FormField
                 control={form.control}
-                name="email"
+                name="website"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Site</FormLabel>
                     <FormControl>
-                      <Input placeholder="contato@prefeitura.gov.br" {...field} />
+                      <Input placeholder="https://www.empresa.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="municipal_registration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Inscrição Municipal</FormLabel>
+                    <FormControl>
+                      <Input placeholder="000000000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="state_registration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Inscrição Estadual</FormLabel>
+                    <FormControl>
+                      <Input placeholder="000000000" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -306,11 +385,11 @@ export const ManagementUnitForm = ({
               />
 
               <div className="md:col-span-2">
-                <FormLabel>Localização *</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <FormLabel>Localização</FormLabel>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
                   <Select value={selectedState} onValueChange={handleStateChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o estado" />
+                      <SelectValue placeholder="Estado" />
                     </SelectTrigger>
                     <SelectContent>
                       {states.map((state) => (
@@ -333,7 +412,7 @@ export const ManagementUnitForm = ({
                             disabled={!selectedState}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione a cidade" />
+                              <SelectValue placeholder="Cidade" />
                             </SelectTrigger>
                             <SelectContent>
                               {cities.map((city) => (
@@ -343,6 +422,19 @@ export const ManagementUnitForm = ({
                               ))}
                             </SelectContent>
                           </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="zip_code"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="CEP" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -359,7 +451,7 @@ export const ManagementUnitForm = ({
                     <FormLabel>Endereço</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Endereço completo da unidade gestora"
+                        placeholder="Endereço completo da empresa"
                         className="resize-none"
                         {...field}
                       />
@@ -373,11 +465,11 @@ export const ManagementUnitForm = ({
                 control={form.control}
                 name="is_active"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm md:col-span-2">
                     <div className="space-y-0.5">
-                      <FormLabel>Unidade Ativa</FormLabel>
+                      <FormLabel>Fornecedor Ativo</FormLabel>
                       <div className="text-sm text-muted-foreground">
-                        Unidades inativas não podem criar cestas de preços
+                        Fornecedores inativos não podem receber cotações
                       </div>
                     </div>
                     <FormControl>
@@ -396,7 +488,7 @@ export const ManagementUnitForm = ({
                 Cancelar
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Salvando...' : (unit ? 'Atualizar' : 'Criar')}
+                {loading ? 'Salvando...' : (supplier ? 'Atualizar' : 'Cadastrar')}
               </Button>
             </div>
           </form>
