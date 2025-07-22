@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CalendarDays, ShoppingBasket, TrendingUp, Users, FileText, AlertCircle, Eye, BarChart3, Bell } from 'lucide-react';
+import { CalendarDays, ShoppingBasket, TrendingUp, Users, FileText, AlertCircle, Eye, BarChart3, Bell, Search, Calculator, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -12,6 +12,10 @@ import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
+import AutomaticCommonObjectSearch from '@/components/search/AutomaticCommonObjectSearch';
+import BPSWeightedAverage from '@/components/analytics/BPSWeightedAverage';
+import CriticalPriceAnalysis from '@/components/analytics/CriticalPriceAnalysis';
+import AutomaticDocumentGeneration from '@/components/documents/AutomaticDocumentGeneration';
 
 export const Dashboard = () => {
   const { profile, user, loading } = useAuth();
@@ -186,6 +190,10 @@ export const Dashboard = () => {
           <TabsTrigger value="analytics">
             <BarChart3 className="h-4 w-4 mr-2" />
             Analytics
+          </TabsTrigger>
+          <TabsTrigger value="advanced">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            Funcionalidades Avançadas
           </TabsTrigger>
         </TabsList>
 
@@ -373,6 +381,95 @@ export const Dashboard = () => {
 
         <TabsContent value="analytics">
           <AnalyticsDashboard />
+        </TabsContent>
+
+        <TabsContent value="advanced" className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="border-l-4 border-l-blue-500">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Search className="h-8 w-8 text-blue-500" />
+                  <div>
+                    <h3 className="font-medium">Busca Automática</h3>
+                    <p className="text-sm text-muted-foreground">Objetos comuns</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-l-green-500">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Calculator className="h-8 w-8 text-green-500" />
+                  <div>
+                    <h3 className="font-medium">Média Ponderada BPS</h3>
+                    <p className="text-sm text-muted-foreground">Análise estatística</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-l-orange-500">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Shield className="h-8 w-8 text-orange-500" />
+                  <div>
+                    <h3 className="font-medium">Análise Crítica</h3>
+                    <p className="text-sm text-muted-foreground">Preços e riscos</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-l-purple-500">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <FileText className="h-8 w-8 text-purple-500" />
+                  <div>
+                    <h3 className="font-medium">Docs Automáticos</h3>
+                    <p className="text-sm text-muted-foreground">Comprobatórios</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Tabs defaultValue="search" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="search">
+                <Search className="w-4 h-4 mr-2" />
+                Busca Automática
+              </TabsTrigger>
+              <TabsTrigger value="weighted">
+                <Calculator className="w-4 h-4 mr-2" />
+                Média Ponderada
+              </TabsTrigger>
+              <TabsTrigger value="analysis">
+                <Shield className="w-4 h-4 mr-2" />
+                Análise Crítica
+              </TabsTrigger>
+              <TabsTrigger value="documents">
+                <FileText className="w-4 h-4 mr-2" />
+                Documentos
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="search">
+              <AutomaticCommonObjectSearch />
+            </TabsContent>
+
+            <TabsContent value="weighted">
+              <BPSWeightedAverage />
+            </TabsContent>
+
+            <TabsContent value="analysis">
+              <CriticalPriceAnalysis />
+            </TabsContent>
+
+            <TabsContent value="documents">
+              <AutomaticDocumentGeneration />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
     </div>

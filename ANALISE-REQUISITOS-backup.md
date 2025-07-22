@@ -49,7 +49,7 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 ## 📦 Catálogo de Produtos e Serviços
 
 ### ✅ **2.6 Catálogo Padronizado**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+- **Status**: ✅ **IMPLEMENTADO**
 - **Requisitos**:
   - ✅ Catálogo padronizado conforme TCE/ES
   - ✅ Descrições e unidades de medida padronizadas
@@ -63,13 +63,13 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 - **Prioridade**: ✅ **CONCLUÍDA**
 
 ### ✅ **2.7 Base de Produtos Comuns**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+- **Status**: ✅ **IMPLEMENTADO**
 - **Requisitos**: ✅ Base de produtos comuns com filtro por elemento de despesa
 - **Detalhes**: Catálogo de produtos comuns implementado com códigos e especificações
 - **Prioridade**: ✅ **CONCLUÍDA**
 
 ### ✅ **2.8 Gestão de Solicitações de Produtos**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+- **Status**: ✅ **IMPLEMENTADO**
 - **Requisitos**: ✅ Sistema de solicitação de inclusão de produtos (resposta em 24h)
 - **Detalhes**: Sistema completo de solicitações com aprovação/rejeição por administradores
 - **Funcionalidades**:
@@ -84,7 +84,7 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 ## 🏪 Gestão de Fornecedores
 
 ### ✅ **2.9 Cadastro de Fornecedores**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+- **Status**: ✅ **IMPLEMENTADO**
 - **Detalhes**: Sistema completo de cadastro e gestão de fornecedores
 - **Campos implementados**: 
   - ✅ CPF/CNPJ, razão social, nome fantasia
@@ -114,7 +114,7 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 ## 🛒 Sistema de Cestas de Preços
 
 ### ✅ **2.12 Cadastro de Cotações/Médias**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+- **Status**: ✅ **IMPLEMENTADO**
 - **Detalhes**: Sistema completo de cestas de preços
 - **Campos implementados**: 
   - ✅ Descrição, data de referência, tipo de cálculo
@@ -129,7 +129,7 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 - **Prioridade**: ✅ **CONCLUÍDA**
 
 ### ✅ **2.13 Formação de Lista de Itens**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+- **Status**: ✅ **IMPLEMENTADO**
 - **Requisitos**: ✅ Seleção do catálogo com agrupamento em lotes
 - **Detalhes**: Sistema de itens de cesta implementado
 - **Funcionalidades**:
@@ -140,22 +140,13 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 - **Dependência**: ✅ Catálogo de produtos (2.6)
 - **Prioridade**: ✅ **CONCLUÍDA**
 
-### ✅ **2.14-2.15 Apresentação de Preços Históricos**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+### ❌ **2.14-2.15 Apresentação de Preços Históricos**
+- **Status**: ❌ **NÃO IMPLEMENTADO**
 - **Requisitos**: 
-  - ✅ Menor/maior preço, média e mediana dos últimos 12 meses
-  - ✅ Documentos comprobatórios das fontes
-  - ✅ Valores por lote e totais gerais
-- **Detalhes**: Dashboard completo de análise de preços históricos
-- **Funcionalidades**:
-  - ✅ Filtros por produto, categoria, período e fonte
-  - ✅ Gráficos de evolução temporal de preços
-  - ✅ Estatísticas resumidas (min, max, média, mediana)
-  - ✅ Distribuição por fonte de dados
-  - ✅ Análise de tendências e variações
-  - ✅ Integração com tabelas price_history e price_analytics
-- **Tecnologias**: React Query, Recharts, date-fns
-- **Prioridade**: ✅ **CONCLUÍDA**
+  - Menor/maior preço, média e mediana dos últimos 12 meses
+  - Documentos comprobatórios das fontes
+  - Valores por lote e totais gerais
+- **Prioridade**: 🔴 **ALTA**
 
 ### ❌ **2.16 Pesquisa Rápida de Preços**
 - **Status**: ❌ **NÃO IMPLEMENTADO**
@@ -176,22 +167,10 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 
 ---
 
-## 📧 Sistema de Cotação Eletrônica
-
-### ✅ **2.22 Sistema de Gestão de Cotações**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
-- **Detalhes**: Interface administrativa para gerenciar cotações eletrônicas
-- **Funcionalidades**:
-  - Criação de cotações baseadas em cestas de preços finalizadas
-  - Configuração de prazos e mensagens personalizadas
-  - Painel de acompanhamento em tempo real
-  - Estatísticas de envio e resposta
-  - Controle de status (ativa/expirada/concluída)
-  - Sistema de lembretes para fornecedores pendentes
-  - Interface responsiva e intuitiva
+## 📧 Cotação Eletrônica
 
 ### ✅ **2.23 Portal de Cotação para Fornecedores**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
+- **Status**: ✅ **IMPLEMENTADO**
 - **Detalhes**: Portal web completo para fornecedores responderem cotações
 - **URL**: `/quotation/{token}` (acesso por token único)
 - **Funcionalidades**:
@@ -199,75 +178,55 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
   - Validação de prazos em tempo real
   - Cotação item por item com totais automáticos
   - Campos para observações e prazos de entrega
-  - Prevenção de dupla submissão
-  - Confirmação visual de envio bem-sucedido
-  - Layout profissional com branding municipal
 
 ### ✅ **2.24 Sistema de Envio Automático**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
-- **Detalhes**: Edge Function completa para envio de convites + Interface de Configuração
+- **Status**: ✅ **IMPLEMENTADO (Backend)**
+- **Detalhes**: Edge Function para envio de convites
 - **Funcionalidades**:
   - Geração de tokens únicos por fornecedor/cotação
   - Templates HTML personalizados para emails
   - Controle de prazo configurável
   - Log de status de envio
-  - Contabilização automática de emails enviados
-  - Sistema de retry para falhas de envio
-  - Seleção automática de fornecedores ativos
-  - **NOVO**: Interface administrativa para configurar provedores (SendGrid/SMTP)
-  - **NOVO**: Sistema de teste de email integrado
-  - **NOVO**: Configurações persistentes no banco de dados
-- **Provedores Suportados**: SendGrid, SMTP Customizado, Mock (desenvolvimento)
-- **Status**: ✅ **PRONTO PARA PRODUÇÃO**
+- **Pendente**: Integração com serviço real de email (atualmente mock)
 
 ### ✅ **2.25 Controle de Acesso e Autenticação**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
-- **Detalhes**: Sistema robusto de tokens de acesso únicos
+- **Status**: ✅ **IMPLEMENTADO**
+- **Detalhes**: Sistema de tokens de acesso únicos
 - **Funcionalidades**:
-  - Token único por cotação/fornecedor (UUID v4)
+  - Token único por cotação/fornecedor
   - Validação automática de prazo de validade
   - Controle de status (pendente/enviado/expirado)
   - Segurança por RLS (Row Level Security)
-  - Expiração automática após prazo limite
-  - Log de acessos ao portal
-  - Prevenção de acesso não autorizado
 
 ### ✅ **2.26 Processamento de Respostas**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
-- **Detalhes**: Sistema completo de coleta e validação de respostas
+- **Status**: ✅ **IMPLEMENTADO**
+- **Detalhes**: Sistema completo de coleta e validação
 - **Funcionalidades**:
-  - Validação de dados de entrada (valores, prazos)
+  - Validação de dados de entrada
   - Cálculo automático de totais por item e geral
   - Armazenamento estruturado no banco
   - Prevenção de reenvio de cotações já submetidas
-  - Timestamp de submissão
-  - Status tracking (pending → submitted)
-  - Validação de valores mínimos e máximos
 
 ### ✅ **2.27 Relatórios Comparativos**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
-- **Detalhes**: Sistema completo de comparação de cotações
+- **Status**: ✅ **IMPLEMENTADO (Backend)**
+- **Detalhes**: Geração automática de comparativos
 - **Funcionalidades**:
   - Comparação item por item entre fornecedores
   - Identificação automática de menores preços
-  - Estatísticas de participação e taxa de resposta
-  - Resumo executivo por fornecedor
-  - Interface web completa para visualização
-  - Cálculos de diferenças percentuais e absolutas
-  - Ranking automático por melhor preço
-  - Análise estatística (menor, maior, média)
+  - Estatísticas de participação
+  - Resumo por fornecedor
+- **Pendente**: Interface web para visualização dos relatórios
 
-### ✅ **2.28 Sistema de Lembretes**
-- **Status**: ✅ **IMPLEMENTADO COMPLETO**
-- **Detalhes**: Sistema automático de lembretes para fornecedores
-- **Funcionalidades**:
-  - Envio manual de lembretes via interface
-  - Templates específicos para lembretes
-  - Identificação automática de fornecedores pendentes
-  - Log de lembretes enviados
-  - Interface administrativa para controle
-  - Botões de ação contextuais
-- **Prioridade**: ✅ **CONCLUÍDA**
+### ⚠️ **2.28 Sistema de Lembretes**
+- **Status**: ⚠️ **PARCIALMENTE IMPLEMENTADO**
+- **Implementado**: 
+  - Backend para envio de lembretes
+  - Templates de email para lembretes
+  - API para verificação de prazos próximos
+- **Pendente**: 
+  - Automação via cron jobs ou triggers
+  - Interface para configuração de lembretes
+- **Prioridade**: � **MÉDIA**
 
 ---
 
@@ -280,7 +239,6 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
   - Edge Function `price-sync` para sincronização
   - Interface administrativa para gestão de integrações
   - Sistema de coleta e armazenamento de preços externos
-  - Tabelas para preços históricos externos
 - **Pendente**: 
   - Implementação específica de cada API/portal
   - Configuração de credenciais de acesso
@@ -346,26 +304,24 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 
 ---
 
-## 📈 Análise Atualizada de Prioridades de Desenvolvimento
+## 📈 Análise de Prioridades de Desenvolvimento
 
 ### 🔴 **CRÍTICO - Implementação Imediata**
-1. ✅ **Integrações com Portais** (2.29-2.30) - Conectar com APIs externas para coleta de preços **IMPLEMENTADO**
+1. **Integrações com Portais** (2.29-2.30) - Conectar com APIs externas
+2. **Interface de Relatórios de Cotação** (2.27 frontend) - Visualização web
+3. **Apresentação de Preços Históricos** (2.14-2.15) - Dashboard e gráficos
 
-### ✅ **RECÉM CONCLUÍDO**
-1. ✅ **Dashboard de Preços Históricos** (2.14-2.15) - Visualização e análise de dados históricos **IMPLEMENTADO**
-2. ✅ **Sistema de Integrações Externas** (2.17-2.18) - Interface de configuração e monitoramento **IMPLEMENTADO**
+### 🔴 **ALTA - Próxima Sprint**
+1. **Funcionalidades de Pesquisa** (2.34-2.39) - Filtros avançados
+2. **Relatórios e Análises** (2.44-2.49) - Ferramentas de análise
+3. **Gestão de Fornecedores Avançada** (2.10-2.11) - CRUD completo
+4. **Sistema de Email Real** (2.24) - Integração SMTP/SendGrid
 
-### 🔴 **ALTA - Próxima Sprint (4-6 semanas)**
-1. **Funcionalidades de Pesquisa** (2.34-2.39) - Filtros avançados e buscas por portal
-2. **Relatórios e Análises** (2.44-2.49) - Ferramentas de análise crítica e exportação
-3. **Gestão de Fornecedores Avançada** (2.10-2.11) - Filtros por objeto e produto
-4. **Detalhamento de Modal de Comparação** - Expandir funcionalidades do sistema de cotação
-
-### 🟡 **MÉDIA - Implementação Gradual (6-10 semanas)**
-1. **Correção Monetária** (2.18-2.21) - IPCA/IGPM
-2. **Pesquisa Rápida de Preços** (2.16) - Consultas automáticas
-3. **Tabela CMED** (2.31-2.33) - Medicamentos ANVISA
-4. **Cadastro de Cidades** (2.4 completo) - Interface administrativa
+### 🟡 **MÉDIA - Implementação Gradual**
+1. **Correção Monetária** (2.18-2.21)
+2. **Pesquisa Rápida de Preços** (2.16)
+3. **Tabela CMED** (2.31-2.33)
+4. **Cadastro de Cidades** (2.4 completo)
 
 ---
 
@@ -376,119 +332,77 @@ Este documento apresenta uma análise completa dos requisitos técnicos e funcio
 - Vite 5.4.1
 - Tailwind CSS + shadcn/ui
 - React Hook Form + Zod
-- React Query (TanStack Query)
-- React Router DOM
+- React Query
 
 ### **Backend**
 - Supabase (PostgreSQL + Edge Functions)
 - Row Level Security (RLS)
 - Real-time subscriptions
 - Supabase Auth
-- Deno runtime para Edge Functions
 
 ### **Infraestrutura**
 - Hospedagem: Supabase Cloud
 - Banco de dados: PostgreSQL 17.4.1
 - CDN e assets: Supabase Storage
-- Email: Configurável (SendGrid/AWS SES)
-
----
-
-## 🎉 Marco Atual: Sistema de Cotação Eletrônica Completo
-
-### **✅ FUNCIONALIDADES 100% IMPLEMENTADAS:**
-
-1. **Sistema Administrativo de Cotações**:
-   - Interface para criar cotações baseadas em cestas finalizadas
-   - Configuração de prazos e mensagens
-   - Dashboard em tempo real com estatísticas
-   - Sistema de lembretes manual
-
-2. **Portal do Fornecedor**:
-   - Acesso seguro via token único
-   - Interface responsiva e profissional
-   - Validação de prazos em tempo real
-   - Cotação item por item com cálculos automáticos
-
-3. **Sistema de Processamento**:
-   - Envio automático de convites por email
-   - Coleta e validação de respostas
-   - Comparação automática entre fornecedores
-   - Identificação de melhores preços
-
-4. **Backend Robusto**:
-   - Edge Functions para lógica de negócio
-   - Segurança com RLS
-   - Estrutura de dados normalizada
-   - APIs RESTful completas
 
 ---
 
 ## 📋 Próximos Passos Recomendados
 
-### **Fase 1 - Análises e Relatórios (4-6 semanas) - PRÓXIMA PRIORIDADE**
-1. **Funcionalidades de Pesquisa** (2.34-2.39) - Filtros avançados e buscas por portal
-2. **Relatórios e Análises** (2.44-2.49) - Ferramentas de análise crítica e exportação
-3. **Gestão de Fornecedores Avançada** (2.10-2.11) - Filtros por objeto e produto
-4. **Detalhamento de Modal de Comparação** - Expandir funcionalidades do sistema de cotação
+### **Fase 1 - Integrações e Cotação (4-6 semanas)**
+1. Implementar integrações principais (PNCP, BPS, Painel de Preços, SINAPI)
+2. Desenvolver sistema de cotação eletrônica
+3. Criar portal de cotação para fornecedores
+4. Implementar apresentação de preços históricos
 
-### **Fase 2 - Análises e Relatórios (3-4 semanas)**
-1. Ferramentas avançadas de pesquisa e filtros
-2. Análise crítica de preços com alertas
-3. Exportação para XLS/XLSX
-4. Relatórios comparativos detalhados
-5. Sistema de anexos e documentos comprobatórios
+### **Fase 2 - Pesquisa e Análises (3-4 semanas)**
+1. Funcionalidades avançadas de pesquisa e filtros
+2. Ferramentas de análise crítica
+3. Relatórios completos
+4. Exportação de dados e documentos comprobatórios
 
 ### **Fase 3 - Funcionalidades Avançadas (2-3 semanas)**
-1. Correção monetária (IPCA/IGPM)
-2. Gestão avançada de fornecedores
-3. Pesquisa rápida de preços
-4. Histórico municipal
+1. Correção monetária
+2. Pesquisa rápida de preços
+3. Sistema de alertas
+4. Tabela CMED
 
-### **Fase 4 - Otimizações (2-3 semanas)**
-1. Performance e caching
+### **Fase 4 - Otimizações e Melhorias (2-3 semanas)**
+1. Performance e otimizações
 2. Funcionalidades regionais
-3. Integração CMED
+3. Integrações adicionais
 4. Documentação e treinamento
 
 ---
 
-## 🎯 Conclusão Atualizada
+## 🎯 Conclusão
 
-O sistema evoluiu significativamente com a implementação completa do **Sistema de Cotação Eletrônica**, representando um marco importante no desenvolvimento:
+O sistema possui uma **base sólida implementada** com as funcionalidades core já desenvolvidas:
 
-### **✅ PROGRESSO ATUAL (75% do sistema):**
+✅ **IMPLEMENTADO (60% do sistema):**
+- Autenticação e gestão de usuários completa
+- Catálogo de produtos e serviços padronizado
+- Gestão de fornecedores completa
+- Sistema de cestas de preços básico
+- Solicitações de produtos com aprovação
+- Estrutura de banco robusta com RLS
 
-**Módulos Completos**:
-- ✅ Autenticação e gestão de usuários
-- ✅ Catálogo de produtos padronizado  
-- ✅ Gestão de fornecedores
-- ✅ Sistema de cestas de preços
-- ✅ Solicitações de produtos
-- ✅ **NOVO: Sistema completo de cotação eletrônica**
-- ✅ **NOVO: Portal do fornecedor**
-- ✅ **NOVO: Comparação de cotações**
-- ✅ Estrutura de integrações (infraestrutura)
+❌ **PENDENTE (40% do sistema):**
+- Integrações com portais externos
+- Cotação eletrônica
+- Análises e relatórios avançados
+- Correção monetária
+- Funcionalidades de pesquisa avançada
 
-**Pendências Críticas (25% restante)**:
-- ❌ Integrações com APIs externas (conectividade)
-- ❌ Dashboard de preços históricos (visualização)
-- ❌ Sistema de pesquisa avançada (UX)
-- ❌ Relatórios e análises críticas (insights)
+**Status geral: ~60% implementado**
 
-### **🚀 DIFERENCIAIS COMPETITIVOS ALCANÇADOS:**
-1. **Sistema de cotação eletrônica completo e funcional**
-2. **Portal profissional para fornecedores**
-3. **Comparação automática de preços**  
-4. **Interface administrativa moderna e responsiva**
-5. **Arquitetura escalável com Supabase**
-
-**Status geral: ~75% implementado**
-
-O próximo foco deve ser em **conectividade externa** (integrações) e **visualização de dados** (dashboards) para completar as funcionalidades core do sistema.
+As próximas implementações devem focar em:
+1. **Integrações com portais** (fonte dos preços)
+2. **Cotação eletrônica** (diferencial competitivo)
+3. **Análises e relatórios** (valor agregado)
+4. **Funcionalidades avançadas** (otimização)
 
 ---
 
-*Documento atualizado em: 21 de julho de 2025*  
-*Sistema: Cestas de Preços Públicas v2.0*  
-*Marco: Sistema de Cotação Eletrônica Completo*
+*Documento gerado em: 21 de julho de 2025*  
+*Sistema: Cestas de Preços Públicas v1.0*

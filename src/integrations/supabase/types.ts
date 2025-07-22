@@ -53,92 +53,6 @@ export type Database = {
         }
         Relationships: []
       }
-      api_sync_logs: {
-        Row: {
-          api_id: string
-          completed_at: string | null
-          error_message: string | null
-          id: string
-          records_processed: number | null
-          started_at: string | null
-          status: string
-          sync_type: string
-        }
-        Insert: {
-          api_id: string
-          completed_at?: string | null
-          error_message?: string | null
-          id?: string
-          records_processed?: number | null
-          started_at?: string | null
-          status: string
-          sync_type: string
-        }
-        Update: {
-          api_id?: string
-          completed_at?: string | null
-          error_message?: string | null
-          id?: string
-          records_processed?: number | null
-          started_at?: string | null
-          status?: string
-          sync_type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "api_sync_logs_api_id_fkey"
-            columns: ["api_id"]
-            isOneToOne: false
-            referencedRelation: "external_apis"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      basket_items: {
-        Row: {
-          basket_id: string
-          created_at: string | null
-          id: string
-          lot_number: number | null
-          observations: string | null
-          product_id: string
-          quantity: number
-        }
-        Insert: {
-          basket_id: string
-          created_at?: string | null
-          id?: string
-          lot_number?: number | null
-          observations?: string | null
-          product_id: string
-          quantity?: number
-        }
-        Update: {
-          basket_id?: string
-          created_at?: string | null
-          id?: string
-          lot_number?: number | null
-          observations?: string | null
-          product_id?: string
-          quantity?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "basket_items_basket_id_fkey"
-            columns: ["basket_id"]
-            isOneToOne: false
-            referencedRelation: "price_baskets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "basket_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       catalog_products: {
         Row: {
           category_id: string | null
@@ -234,45 +148,6 @@ export type Database = {
           },
         ]
       }
-      cmed_products: {
-        Row: {
-          apresentacao_descricao: string
-          created_at: string | null
-          data_atualizacao: string
-          id: string
-          preco_maximo_consumidor: number | null
-          preco_maximo_governo: number | null
-          principio_ativo: string
-          produto_descricao: string
-          registro_anvisa: string
-          updated_at: string | null
-        }
-        Insert: {
-          apresentacao_descricao: string
-          created_at?: string | null
-          data_atualizacao: string
-          id?: string
-          preco_maximo_consumidor?: number | null
-          preco_maximo_governo?: number | null
-          principio_ativo: string
-          produto_descricao: string
-          registro_anvisa: string
-          updated_at?: string | null
-        }
-        Update: {
-          apresentacao_descricao?: string
-          created_at?: string | null
-          data_atualizacao?: string
-          id?: string
-          preco_maximo_consumidor?: number | null
-          preco_maximo_governo?: number | null
-          principio_ativo?: string
-          produto_descricao?: string
-          registro_anvisa?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       external_apis: {
         Row: {
           api_key_required: boolean | null
@@ -303,103 +178,92 @@ export type Database = {
         }
         Relationships: []
       }
-      external_price_sources: {
+      external_price_integrations: {
         Row: {
-          base_url: string
+          api_key_required: boolean | null
           created_at: string | null
           id: string
           is_active: boolean | null
-          last_sync: string | null
-          name: string
-          source_type: string
+          last_sync_at: string | null
+          rate_limit_per_hour: number | null
+          source_name: string
+          source_url: string
+          sync_frequency_hours: number | null
+          updated_at: string | null
         }
         Insert: {
-          base_url: string
+          api_key_required?: boolean | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
-          last_sync?: string | null
-          name: string
-          source_type: string
+          last_sync_at?: string | null
+          rate_limit_per_hour?: number | null
+          source_name: string
+          source_url: string
+          sync_frequency_hours?: number | null
+          updated_at?: string | null
         }
         Update: {
-          base_url?: string
+          api_key_required?: boolean | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
-          last_sync?: string | null
-          name?: string
-          source_type?: string
+          last_sync_at?: string | null
+          rate_limit_per_hour?: number | null
+          source_name?: string
+          source_url?: string
+          sync_frequency_hours?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
-      generated_reports: {
+      external_prices: {
         Row: {
-          completed_at: string | null
           created_at: string | null
-          file_url: string | null
-          generated_by: string | null
+          currency: string | null
+          date: string
           id: string
-          parameters: Json | null
-          report_name: string
-          report_type: string
-          status: string | null
+          location: string | null
+          price: number
+          product_id: string
+          product_name: string | null
+          raw_data: Json | null
+          reference: string | null
+          source: string
+          supplier_name: string | null
+          updated_at: string | null
         }
         Insert: {
-          completed_at?: string | null
           created_at?: string | null
-          file_url?: string | null
-          generated_by?: string | null
+          currency?: string | null
+          date: string
           id?: string
-          parameters?: Json | null
-          report_name: string
-          report_type: string
-          status?: string | null
+          location?: string | null
+          price: number
+          product_id: string
+          product_name?: string | null
+          raw_data?: Json | null
+          reference?: string | null
+          source: string
+          supplier_name?: string | null
+          updated_at?: string | null
         }
         Update: {
-          completed_at?: string | null
           created_at?: string | null
-          file_url?: string | null
-          generated_by?: string | null
+          currency?: string | null
+          date?: string
           id?: string
-          parameters?: Json | null
-          report_name?: string
-          report_type?: string
-          status?: string | null
+          location?: string | null
+          price?: number
+          product_id?: string
+          product_name?: string | null
+          raw_data?: Json | null
+          reference?: string | null
+          source?: string
+          supplier_name?: string | null
+          updated_at?: string | null
         }
         Relationships: []
-      }
-      index_values: {
-        Row: {
-          created_at: string | null
-          id: string
-          index_id: string
-          reference_date: string
-          value: number
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          index_id: string
-          reference_date: string
-          value: number
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          index_id?: string
-          reference_date?: string
-          value?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "index_values_index_id_fkey"
-            columns: ["index_id"]
-            isOneToOne: false
-            referencedRelation: "monetary_indexes"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       management_units: {
         Row: {
@@ -502,225 +366,55 @@ export type Database = {
         }
         Relationships: []
       }
-      municipal_bid_items: {
+      price_analytics: {
         Row: {
-          bid_id: string | null
+          avg_price: number
+          catalog_product_id: string | null
           created_at: string | null
           id: string
-          item_number: number
-          product_description: string
-          quantity: number | null
-          supplier_cnpj: string | null
-          supplier_name: string | null
-          total_price: number | null
-          unit_measure: string
-          unit_price: number | null
+          max_price: number
+          median_price: number
+          min_price: number
+          period_end: string
+          period_start: string
+          price_count: number
+          sources: Json | null
+          supplier_count: number
         }
         Insert: {
-          bid_id?: string | null
+          avg_price: number
+          catalog_product_id?: string | null
           created_at?: string | null
           id?: string
-          item_number: number
-          product_description: string
-          quantity?: number | null
-          supplier_cnpj?: string | null
-          supplier_name?: string | null
-          total_price?: number | null
-          unit_measure: string
-          unit_price?: number | null
+          max_price: number
+          median_price: number
+          min_price: number
+          period_end: string
+          period_start: string
+          price_count: number
+          sources?: Json | null
+          supplier_count: number
         }
         Update: {
-          bid_id?: string | null
+          avg_price?: number
+          catalog_product_id?: string | null
           created_at?: string | null
           id?: string
-          item_number?: number
-          product_description?: string
-          quantity?: number | null
-          supplier_cnpj?: string | null
-          supplier_name?: string | null
-          total_price?: number | null
-          unit_measure?: string
-          unit_price?: number | null
+          max_price?: number
+          median_price?: number
+          min_price?: number
+          period_end?: string
+          period_start?: string
+          price_count?: number
+          sources?: Json | null
+          supplier_count?: number
         }
         Relationships: [
           {
-            foreignKeyName: "municipal_bid_items_bid_id_fkey"
-            columns: ["bid_id"]
+            foreignKeyName: "price_analytics_catalog_product_id_fkey"
+            columns: ["catalog_product_id"]
             isOneToOne: false
-            referencedRelation: "municipal_bids"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      municipal_bids: {
-        Row: {
-          bid_number: string
-          bid_year: number
-          created_at: string | null
-          homologation_date: string | null
-          id: string
-          management_unit_id: string | null
-          modality: string
-          object_description: string
-          total_value: number | null
-        }
-        Insert: {
-          bid_number: string
-          bid_year: number
-          created_at?: string | null
-          homologation_date?: string | null
-          id?: string
-          management_unit_id?: string | null
-          modality: string
-          object_description: string
-          total_value?: number | null
-        }
-        Update: {
-          bid_number?: string
-          bid_year?: number
-          created_at?: string | null
-          homologation_date?: string | null
-          id?: string
-          management_unit_id?: string | null
-          modality?: string
-          object_description?: string
-          total_value?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "municipal_bids_management_unit_id_fkey"
-            columns: ["management_unit_id"]
-            isOneToOne: false
-            referencedRelation: "management_units"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      notification_preferences: {
-        Row: {
-          created_at: string | null
-          email_notifications: boolean | null
-          id: string
-          push_notifications: boolean | null
-          quote_reminders: boolean | null
-          quote_responses: boolean | null
-          system_updates: boolean | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email_notifications?: boolean | null
-          id?: string
-          push_notifications?: boolean | null
-          quote_reminders?: boolean | null
-          quote_responses?: boolean | null
-          system_updates?: boolean | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email_notifications?: boolean | null
-          id?: string
-          push_notifications?: boolean | null
-          quote_reminders?: boolean | null
-          quote_responses?: boolean | null
-          system_updates?: boolean | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      notifications: {
-        Row: {
-          created_at: string | null
-          data: Json | null
-          id: string
-          is_read: boolean | null
-          message: string
-          read_at: string | null
-          title: string
-          type: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          data?: Json | null
-          id?: string
-          is_read?: boolean | null
-          message: string
-          read_at?: string | null
-          title: string
-          type: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          data?: Json | null
-          id?: string
-          is_read?: boolean | null
-          message?: string
-          read_at?: string | null
-          title?: string
-          type?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      price_analysis: {
-        Row: {
-          analyzed_at: string | null
-          analyzed_by: string | null
-          basket_id: string | null
-          basket_item_id: string | null
-          created_at: string | null
-          exclusion_reason: string | null
-          id: string
-          is_excluded_from_average: boolean | null
-          original_price: number
-          price_deviation_percentage: number | null
-          price_source: string
-        }
-        Insert: {
-          analyzed_at?: string | null
-          analyzed_by?: string | null
-          basket_id?: string | null
-          basket_item_id?: string | null
-          created_at?: string | null
-          exclusion_reason?: string | null
-          id?: string
-          is_excluded_from_average?: boolean | null
-          original_price: number
-          price_deviation_percentage?: number | null
-          price_source: string
-        }
-        Update: {
-          analyzed_at?: string | null
-          analyzed_by?: string | null
-          basket_id?: string | null
-          basket_item_id?: string | null
-          created_at?: string | null
-          exclusion_reason?: string | null
-          id?: string
-          is_excluded_from_average?: boolean | null
-          original_price?: number
-          price_deviation_percentage?: number | null
-          price_source?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "price_analysis_basket_id_fkey"
-            columns: ["basket_id"]
-            isOneToOne: false
-            referencedRelation: "price_baskets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "price_analysis_basket_item_id_fkey"
-            columns: ["basket_item_id"]
-            isOneToOne: false
-            referencedRelation: "basket_items"
+            referencedRelation: "catalog_products"
             referencedColumns: ["id"]
           },
         ]
@@ -772,242 +466,84 @@ export type Database = {
           },
         ]
       }
-      price_corrections: {
+      price_history: {
         Row: {
-          applied_at: string | null
-          applied_by: string
-          base_date: string
-          basket_id: string
-          correction_factor: number
-          id: string
-          index_id: string
-          target_date: string
-        }
-        Insert: {
-          applied_at?: string | null
-          applied_by: string
-          base_date: string
-          basket_id: string
-          correction_factor: number
-          id?: string
-          index_id: string
-          target_date: string
-        }
-        Update: {
-          applied_at?: string | null
-          applied_by?: string
-          base_date?: string
-          basket_id?: string
-          correction_factor?: number
-          id?: string
-          index_id?: string
-          target_date?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "price_corrections_basket_id_fkey"
-            columns: ["basket_id"]
-            isOneToOne: false
-            referencedRelation: "price_baskets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "price_corrections_index_id_fkey"
-            columns: ["index_id"]
-            isOneToOne: false
-            referencedRelation: "monetary_indexes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      price_deviation_alerts: {
-        Row: {
-          alert_type: string
-          basket_id: string | null
+          catalog_product_id: string | null
           created_at: string | null
-          deviation_percentage: number | null
-          id: string
-          is_resolved: boolean | null
-          item_description: string
-          message: string
-          threshold_percentage: number | null
-        }
-        Insert: {
-          alert_type: string
-          basket_id?: string | null
-          created_at?: string | null
-          deviation_percentage?: number | null
-          id?: string
-          is_resolved?: boolean | null
-          item_description: string
-          message: string
-          threshold_percentage?: number | null
-        }
-        Update: {
-          alert_type?: string
-          basket_id?: string | null
-          created_at?: string | null
-          deviation_percentage?: number | null
-          id?: string
-          is_resolved?: boolean | null
-          item_description?: string
-          message?: string
-          threshold_percentage?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "price_deviation_alerts_basket_id_fkey"
-            columns: ["basket_id"]
-            isOneToOne: false
-            referencedRelation: "price_baskets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      price_records: {
-        Row: {
-          brand: string | null
-          city_id: string | null
-          created_at: string | null
-          currency: string | null
           document_url: string | null
           id: string
+          management_unit_id: string | null
+          municipality: string | null
           observations: string | null
           price: number
-          product_id: string
+          quantity: number | null
           reference_date: string
-          source_id: string
+          source_id: string | null
+          source_name: string | null
+          source_type: string
+          state: string | null
           supplier_id: string | null
+          unit_price: number | null
+          updated_at: string | null
         }
         Insert: {
-          brand?: string | null
-          city_id?: string | null
+          catalog_product_id?: string | null
           created_at?: string | null
-          currency?: string | null
           document_url?: string | null
           id?: string
+          management_unit_id?: string | null
+          municipality?: string | null
           observations?: string | null
           price: number
-          product_id: string
+          quantity?: number | null
           reference_date: string
-          source_id: string
+          source_id?: string | null
+          source_name?: string | null
+          source_type: string
+          state?: string | null
           supplier_id?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
         }
         Update: {
-          brand?: string | null
-          city_id?: string | null
+          catalog_product_id?: string | null
           created_at?: string | null
-          currency?: string | null
           document_url?: string | null
           id?: string
+          management_unit_id?: string | null
+          municipality?: string | null
           observations?: string | null
           price?: number
-          product_id?: string
+          quantity?: number | null
           reference_date?: string
-          source_id?: string
+          source_id?: string | null
+          source_name?: string | null
+          source_type?: string
+          state?: string | null
           supplier_id?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "price_records_city_id_fkey"
-            columns: ["city_id"]
+            foreignKeyName: "price_history_catalog_product_id_fkey"
+            columns: ["catalog_product_id"]
             isOneToOne: false
-            referencedRelation: "cities"
+            referencedRelation: "catalog_products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "price_records_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: "price_history_management_unit_id_fkey"
+            columns: ["management_unit_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "management_units"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "price_records_source_id_fkey"
-            columns: ["source_id"]
-            isOneToOne: false
-            referencedRelation: "price_sources"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "price_records_supplier_id_fkey"
+            foreignKeyName: "price_history_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      price_sources: {
-        Row: {
-          api_endpoint: string | null
-          created_at: string | null
-          id: string
-          is_active: boolean | null
-          name: string
-          type: Database["public"]["Enums"]["price_source_type"]
-          url: string | null
-        }
-        Insert: {
-          api_endpoint?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          name: string
-          type: Database["public"]["Enums"]["price_source_type"]
-          url?: string | null
-        }
-        Update: {
-          api_endpoint?: string | null
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          name?: string
-          type?: Database["public"]["Enums"]["price_source_type"]
-          url?: string | null
-        }
-        Relationships: []
-      }
-      price_supporting_documents: {
-        Row: {
-          created_at: string | null
-          document_content: string | null
-          document_type: string
-          document_url: string | null
-          file_name: string
-          file_size: number | null
-          id: string
-          mime_type: string | null
-          price_analysis_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          document_content?: string | null
-          document_type: string
-          document_url?: string | null
-          file_name: string
-          file_size?: number | null
-          id?: string
-          mime_type?: string | null
-          price_analysis_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          document_content?: string | null
-          document_type?: string
-          document_url?: string | null
-          file_name?: string
-          file_size?: number | null
-          id?: string
-          mime_type?: string | null
-          price_analysis_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "price_supporting_documents_price_analysis_id_fkey"
-            columns: ["price_analysis_id"]
-            isOneToOne: false
-            referencedRelation: "price_analysis"
             referencedColumns: ["id"]
           },
         ]
@@ -1247,108 +783,6 @@ export type Database = {
           },
         ]
       }
-      quote_items: {
-        Row: {
-          anvisa_registration: string | null
-          basket_item_id: string
-          brand: string | null
-          created_at: string | null
-          id: string
-          observations: string | null
-          quote_id: string
-          total_price: number | null
-          unit_price: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          anvisa_registration?: string | null
-          basket_item_id: string
-          brand?: string | null
-          created_at?: string | null
-          id?: string
-          observations?: string | null
-          quote_id: string
-          total_price?: number | null
-          unit_price?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          anvisa_registration?: string | null
-          basket_item_id?: string
-          brand?: string | null
-          created_at?: string | null
-          id?: string
-          observations?: string | null
-          quote_id?: string
-          total_price?: number | null
-          unit_price?: number | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "quote_items_basket_item_id_fkey"
-            columns: ["basket_item_id"]
-            isOneToOne: false
-            referencedRelation: "basket_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "quote_items_quote_id_fkey"
-            columns: ["quote_id"]
-            isOneToOne: false
-            referencedRelation: "supplier_quotes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      regional_cities: {
-        Row: {
-          created_at: string | null
-          ibge_code: string | null
-          id: string
-          is_regional: boolean | null
-          name: string
-          state_code: string
-        }
-        Insert: {
-          created_at?: string | null
-          ibge_code?: string | null
-          id?: string
-          is_regional?: boolean | null
-          name: string
-          state_code?: string
-        }
-        Update: {
-          created_at?: string | null
-          ibge_code?: string | null
-          id?: string
-          is_regional?: boolean | null
-          name?: string
-          state_code?: string
-        }
-        Relationships: []
-      }
-      regions: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
       states: {
         Row: {
           code: string
@@ -1370,97 +804,151 @@ export type Database = {
         }
         Relationships: []
       }
-      supplier_quote_tokens: {
+      supplier_quotation_items: {
         Row: {
+          basket_item_id: string | null
           created_at: string | null
-          expires_at: string
+          delivery_days: number | null
           id: string
-          is_used: boolean | null
-          quote_id: string
-          token: string
+          observations: string | null
+          quotation_response_id: string | null
+          total_price: number
+          unit_price: number
         }
         Insert: {
+          basket_item_id?: string | null
           created_at?: string | null
-          expires_at: string
+          delivery_days?: number | null
           id?: string
-          is_used?: boolean | null
-          quote_id: string
-          token: string
+          observations?: string | null
+          quotation_response_id?: string | null
+          total_price: number
+          unit_price: number
         }
         Update: {
+          basket_item_id?: string | null
           created_at?: string | null
-          expires_at?: string
+          delivery_days?: number | null
           id?: string
-          is_used?: boolean | null
-          quote_id?: string
-          token?: string
+          observations?: string | null
+          quotation_response_id?: string | null
+          total_price?: number
+          unit_price?: number
         }
         Relationships: [
           {
-            foreignKeyName: "supplier_quote_tokens_quote_id_fkey"
-            columns: ["quote_id"]
+            foreignKeyName: "supplier_quotation_items_basket_item_id_fkey"
+            columns: ["basket_item_id"]
             isOneToOne: false
-            referencedRelation: "supplier_quotes"
+            referencedRelation: "basket_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_quotation_items_quotation_response_id_fkey"
+            columns: ["quotation_response_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_quotation_responses"
             referencedColumns: ["id"]
           },
         ]
       }
-      supplier_quotes: {
+      supplier_quotation_responses: {
         Row: {
           access_token: string | null
-          basket_id: string
           created_at: string | null
-          digital_signature: string | null
-          due_date: string | null
+          delivery_days: number | null
           id: string
-          responded_at: string | null
-          sent_at: string | null
-          signature_certificate: string | null
-          status: Database["public"]["Enums"]["quote_status"] | null
-          supplier_id: string
-          updated_at: string | null
+          observations: string | null
+          quotation_id: string | null
+          status: string
+          submitted_at: string | null
+          supplier_id: string | null
+          total_value: number | null
         }
         Insert: {
           access_token?: string | null
-          basket_id: string
           created_at?: string | null
-          digital_signature?: string | null
-          due_date?: string | null
+          delivery_days?: number | null
           id?: string
-          responded_at?: string | null
-          sent_at?: string | null
-          signature_certificate?: string | null
-          status?: Database["public"]["Enums"]["quote_status"] | null
-          supplier_id: string
-          updated_at?: string | null
+          observations?: string | null
+          quotation_id?: string | null
+          status?: string
+          submitted_at?: string | null
+          supplier_id?: string | null
+          total_value?: number | null
         }
         Update: {
           access_token?: string | null
-          basket_id?: string
           created_at?: string | null
-          digital_signature?: string | null
-          due_date?: string | null
+          delivery_days?: number | null
           id?: string
-          responded_at?: string | null
-          sent_at?: string | null
-          signature_certificate?: string | null
-          status?: Database["public"]["Enums"]["quote_status"] | null
-          supplier_id?: string
+          observations?: string | null
+          quotation_id?: string | null
+          status?: string
+          submitted_at?: string | null
+          supplier_id?: string | null
+          total_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_quotation_responses_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_quotations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_quotation_responses_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_quotations: {
+        Row: {
+          basket_id: string | null
+          created_at: string | null
+          created_by: string | null
+          deadline: string
+          emails_sent: number | null
+          id: string
+          message: string | null
+          status: string
+          total_suppliers: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          basket_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          deadline: string
+          emails_sent?: number | null
+          id?: string
+          message?: string | null
+          status?: string
+          total_suppliers?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          basket_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          deadline?: string
+          emails_sent?: number | null
+          id?: string
+          message?: string | null
+          status?: string
+          total_suppliers?: number | null
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "supplier_quotes_basket_id_fkey"
+            foreignKeyName: "supplier_quotations_basket_id_fkey"
             columns: ["basket_id"]
             isOneToOne: false
             referencedRelation: "price_baskets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "supplier_quotes_supplier_id_fkey"
-            columns: ["supplier_id"]
-            isOneToOne: false
-            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]
@@ -1530,188 +1018,39 @@ export type Database = {
           },
         ]
       }
+      system_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      analyze_price_trends: {
-        Args: {
-          product_id_param?: string
-          management_unit_id_param?: string
-          days_back?: number
-        }
-        Returns: {
-          product_id: string
-          product_name: string
-          category_name: string
-          avg_price: number
-          min_price: number
-          max_price: number
-          price_variance: number
-          trend_direction: string
-          quote_count: number
-        }[]
-      }
-      apply_monetary_correction: {
-        Args: {
-          original_value: number
-          base_date: string
-          target_date: string
-          index_type?: string
-        }
-        Returns: number
-      }
-      approve_product_request: {
-        Args: { request_id: string; admin_response_param?: string }
-        Returns: string
-      }
-      auto_search_common_object_prices: {
-        Args: { product_id_param: string }
-        Returns: Json
-      }
-      calculate_basket_statistics: {
-        Args: { basket_id_param: string }
-        Returns: Json
-      }
-      calculate_bps_weighted_average: {
-        Args: { codigo_br_param: string }
-        Returns: Json
-      }
-      calculate_supplier_ranking: {
-        Args: { management_unit_id_param?: string; days_back?: number }
-        Returns: {
-          supplier_id: string
-          supplier_name: string
-          total_quotes: number
-          responded_quotes: number
-          response_rate: number
-          avg_response_time_hours: number
-          total_value: number
-          avg_discount_percentage: number
-          ranking_score: number
-        }[]
-      }
-      check_product_duplication: {
-        Args: {
-          product_name_param: string
-          product_code_param?: string
-          anvisa_code_param?: string
-          exclude_id?: string
-        }
-        Returns: Json
-      }
-      create_notification: {
-        Args: {
-          user_id_param: string
-          type_param: string
-          title_param: string
-          message_param: string
-          data_param?: Json
-        }
-        Returns: string
-      }
-      create_quote_token: {
-        Args: { quote_uuid: string }
-        Returns: string
-      }
-      duplicate_basket: {
-        Args: {
-          source_basket_id: string
-          new_name: string
-          new_description?: string
-        }
-        Returns: string
-      }
-      generate_quotation_report: {
-        Args: { basket_id_param: string }
-        Returns: Json
-      }
-      generate_quote_token: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_management_unit: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: Database["public"]["Enums"]["user_role"]
-      }
-      get_dashboard_statistics: {
-        Args: { management_unit_id_param?: string; days_back?: number }
-        Returns: Json
-      }
-      get_management_unit_stats: {
-        Args: { unit_id: string }
-        Returns: Json
-      }
-      get_popular_basket_products: {
-        Args: { management_unit_id_param?: string; limit_param?: number }
-        Returns: {
-          product_id: string
-          product_name: string
-          product_code: string
-          category_name: string
-          usage_count: number
-          avg_quantity: number
-        }[]
-      }
-      is_valid_management_unit: {
-        Args: { unit_id: string }
-        Returns: boolean
-      }
-      log_activity: {
-        Args: {
-          action_type_param: string
-          entity_type_param: string
-          entity_id_param: string
-          description_param: string
-          metadata_param?: Json
-        }
-        Returns: string
-      }
-      mark_notification_read: {
-        Args: { notification_id_param: string }
-        Returns: boolean
-      }
-      reject_product_request: {
-        Args: { request_id: string; admin_response_param: string }
-        Returns: undefined
-      }
-      search_similar_products: {
-        Args: { search_term: string; limit_param?: number }
-        Returns: {
-          id: string
-          name: string
-          code: string
-          anvisa_code: string
-          category_name: string
-          measurement_unit: string
-          similarity_score: number
-        }[]
-      }
-      send_quotation_batch: {
-        Args: {
-          basket_id_param: string
-          supplier_ids: string[]
-          due_date_param: string
-        }
-        Returns: Json
-      }
-      validate_basket_finalization: {
-        Args: { basket_id_param: string }
-        Returns: Json
-      }
-      validate_digital_signature: {
-        Args: {
-          quote_id_param: string
-          signature_data: string
-          certificate_data: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       basket_calculation_type: "media" | "mediana" | "menor_preco"

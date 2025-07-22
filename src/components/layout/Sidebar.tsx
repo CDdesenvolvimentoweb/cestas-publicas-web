@@ -14,6 +14,7 @@ import {
   Database,
   TrendingUp,
   Download,
+  Mail,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -58,6 +59,12 @@ const navigationItems = [
     roles: ['admin', 'servidor', 'fornecedor'],
   },
   {
+    title: 'Preços Históricos',
+    href: '/dashboard',
+    icon: TrendingUp,
+    roles: ['admin', 'servidor'],
+  },
+  {
     title: 'Relatórios',
     href: '/app/reports',
     icon: Download,
@@ -85,6 +92,12 @@ const navigationItems = [
     title: 'Integrações',
     href: '/app/integrations',
     icon: Settings,
+    roles: ['admin'],
+  },
+  {
+    title: 'Configurações de Email',
+    href: '/app/email-settings',
+    icon: Mail,
     roles: ['admin'],
   },
 ];

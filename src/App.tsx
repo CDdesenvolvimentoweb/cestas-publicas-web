@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Dashboard } from "@/pages/Dashboard";
+import PriceHistoryDashboard from "@/pages/PriceHistoryDashboard";
 import { ManagementUnits } from "@/pages/ManagementUnits";
 import { Suppliers } from "@/pages/Suppliers";
 import { ProductCategories } from "@/pages/ProductCategories";
@@ -13,12 +14,14 @@ import Products from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
 import { Quotations } from "@/pages/Quotations";
 import { SupplierQuote } from "@/pages/SupplierQuote";
+import SupplierQuotation from "@/pages/SupplierQuotation";
 import { SupplierPortal } from "@/pages/SupplierPortal";
 import { UnitDashboard } from "@/pages/UnitDashboard";
 import { UserManagement } from "@/pages/UserManagement";
 import { Login } from "@/pages/Login";
 import Reports from "@/pages/Reports";
 import Integrations from "@/pages/Integrations";
+import EmailSettings from "@/pages/EmailSettings";
 import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
 
@@ -35,6 +38,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/supplier-quote" element={<SupplierQuote />} />
+          <Route path="/quotation/:token" element={<SupplierQuotation />} />
           <Route path="/supplier-portal/:token" element={<SupplierPortal />} />
           
           {/* Protected routes */}
@@ -43,7 +47,7 @@ const App = () => (
               <MainLayout />
             </AuthLayout>
           }>
-            <Route index element={<Dashboard />} />
+            <Route index element={<PriceHistoryDashboard />} />
           </Route>
           
           <Route path="/app" element={
@@ -59,6 +63,7 @@ const App = () => (
             <Route path="quotations" element={<Quotations />} />
             <Route path="reports" element={<Reports />} />
             <Route path="integrations" element={<Integrations />} />
+            <Route path="email-settings" element={<EmailSettings />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="unit-dashboard" element={<UnitDashboard />} />
           </Route>
