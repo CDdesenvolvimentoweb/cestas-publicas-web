@@ -59,15 +59,15 @@ export function ProductRequestsList() {
 
   const fetchRequests = async () => {
     try {
-      // Query simplificada para evitar problemas de relacionamento
+      // Query corrigida com sintaxe adequada para relacionamentos
       const { data, error } = await supabase
         .from("product_requests")
         .select(`
           *,
-          requester:profiles(full_name),
-          management_units(name),
-          product_categories(name),
-          measurement_units(name, symbol)
+          requester:profiles!requester_id(full_name),
+          management_units!management_unit_id(name),
+          product_categories!category_id(name),
+          measurement_units!measurement_unit_id(name, symbol)
         `)
         .order("created_at", { ascending: false });
 

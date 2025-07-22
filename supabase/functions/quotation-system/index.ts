@@ -8,6 +8,8 @@ declare const Deno: any;
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
+  'Access-Control-Max-Age': '86400',
 }
 
 interface QuotationRequest {
@@ -24,8 +26,12 @@ interface EmailTemplate {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { 
+      headers: corsHeaders,
+      status: 200
+    })
   }
 
   try {
@@ -71,13 +77,12 @@ async function sendQuotationRequest(supabase: any, request: QuotationRequest) {
       basket_items (
         id,
         quantity,
-        unit_price,
-        catalog_products (
+        products (
           id,
           name,
           description,
-          measurement_unit,
-          tce_code
+          code,
+          measurement_units (name, symbol)
         )
       ),
       management_units (name)
@@ -223,96 +228,6 @@ async function sendQuotationRequest(supabase: any, request: QuotationRequest) {
   })
 }
 
-async function processSupplierResponse(supabase: any, params: any) {
-  const { access_token, quotation_items } = params
-
-  // Validate access token
-  const { data: supplierQuotation, error: tokenError } = await supabase
-    .from('supplier_quotation_responses')
-    .select('*')
-    .eq('access_token', access_token)
-    .eq('status', 'pending')
-    .single()
-
-  if (tokenError || !supplierQuotation) {
-    throw new Error('Invalid or expired access token')
-  }
-
-  // Update quotation items
-  for (const item of quotation_items) {
-    await supabase
-      .from('supplier_quotation_items')
-      .upsert({
-        quotation_response_id: supplierQuotation.id,
-        basket_item_id: item.basket_item_id,
-        unit_price: item.unit_price,
-        total_price: item.total_price,
-        delivery_days: item.delivery_days,
-        observations: item.observations
-      })
-  }
-
-  // Update response status
-  await supabase
-    .from('supplier_quotation_responses')
-    .update({
-      status: 'submitted',
-      submitted_at: new Date().toISOString()
-    })
-    .eq('id', supplierQuotation.id)
-
-  return new Response(JSON.stringify({
-    success: true,
-    message: 'Quotation submitted successfully'
-  }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  })
-}
-
-async function getQuotationStatus(supabase: any, quotationId: string) {
-  const { data: quotation, error } = await supabase
-    .from('supplier_quotations')
-    .select(`
-      *,
-      supplier_quotation_responses (
-        id,
-        supplier_id,
-        status,
-        submitted_at,
-        suppliers (company_name, email),
-        supplier_quotation_items (
-          id,
-          basket_item_id,
-          unit_price,
-          total_price,
-          delivery_days
-        )
-      )
-    `)
-    .eq('id', quotationId)
-    .single()
-
-  if (error) {
-    throw new Error('Quotation not found')
-  }
-
-  const summary = {
-    total_suppliers: quotation.total_suppliers,
-    responses_received: quotation.supplier_quotation_responses.filter((r: any) => r.status === 'submitted').length,
-    responses_pending: quotation.supplier_quotation_responses.filter((r: any) => r.status === 'pending').length,
-  }
-
-  return new Response(JSON.stringify({
-    success: true,
-    quotation,
-    summary
-  }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  })
-}
-
 async function sendDeadlineReminder(supabase: any, quotationId: string) {
   const { data: pendingResponses } = await supabase
     .from('supplier_quotation_responses')
@@ -385,207 +300,63 @@ async function sendDeadlineReminder(supabase: any, quotationId: string) {
   })
 }
 
-function generateQuotationEmail(basket: any, supplier: any, accessToken: string, deadline: string, message?: string): EmailTemplate {
-  const baseUrl = Deno.env.get('SUPABASE_URL')?.replace('supabase.co', 'supabase.app') || 'http://localhost:5173'
-  const quotationUrl = `${baseUrl}/supplier-quote?token=${accessToken}`
-  
-  const itemsHtml = basket.basket_items.map((item: any) => `
-    <tr>
-      <td style="padding: 8px; border: 1px solid #ddd;">${item.catalog_products.name}</td>
-      <td style="padding: 8px; border: 1px solid #ddd;">${item.quantity} ${item.catalog_products.measurement_unit}</td>
-      <td style="padding: 8px; border: 1px solid #ddd;">${item.catalog_products.tce_code || '-'}</td>
-    </tr>
-  `).join('')
-
-  const subject = `Solicitação de Cotação - ${basket.name} - ${basket.management_units.name}`
-  
-  const html = `
-    <html>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <h2 style="color: #2563eb;">Solicitação de Cotação de Preços</h2>
-        
-        <p>Prezado(a) fornecedor <strong>${supplier.company_name}</strong>,</p>
-        
-        <p>A <strong>${basket.management_units.name}</strong> está solicitando cotação para os seguintes itens:</p>
-        
-        <div style="margin: 20px 0;">
-          <h3>Detalhes da Cotação:</h3>
-          <ul>
-            <li><strong>Cesta:</strong> ${basket.name}</li>
-            <li><strong>Prazo para resposta:</strong> ${new Date(deadline).toLocaleDateString('pt-BR')}</li>
-            <li><strong>Total de itens:</strong> ${basket.basket_items.length}</li>
-          </ul>
-        </div>
-
-        ${message ? `
-          <div style="background: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h4>Observações:</h4>
-            <p>${message}</p>
+// Test email function
+async function testEmail(supabase: any, email: string) {
+  try {
+    const testTemplate = {
+      subject: "Teste de Email - Sistema de Cestas de Preços",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #28a745; color: white; padding: 20px; text-align: center; border-radius: 8px;">
+            <h1>✅ Teste de Email</h1>
+            <p>Sistema de Cestas de Preços Públicas</p>
           </div>
-        ` : ''}
-        
-        <h3>Itens para Cotação:</h3>
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-          <thead>
-            <tr style="background-color: #f8f9fa;">
-              <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Produto</th>
-              <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Quantidade</th>
-              <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Código TCE</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-        </table>
-        
-        <div style="background: #dbeafe; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
-          <h3 style="margin-top: 0; color: #1d4ed8;">Acesse o Portal de Cotação</h3>
-          <p>Clique no link abaixo para acessar o sistema e enviar sua proposta:</p>
-          <a href="${quotationUrl}" 
-             style="display: inline-block; background: #2563eb; color: white; padding: 15px 30px; 
-                    text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0;">
-            ENVIAR COTAÇÃO
-          </a>
-          <p style="font-size: 12px; color: #6b7280;">Link válido até ${new Date(deadline).toLocaleDateString('pt-BR')}</p>
+          <div style="background-color: #f8f9fa; padding: 20px; border: 1px solid #dee2e6; margin-top: 20px;">
+            <h3>Configuração funcionando corretamente!</h3>
+            <p>Este é um email de teste para verificar se as configurações de email estão funcionando.</p>
+            <p><strong>Data/Hora:</strong> ${new Date().toLocaleString("pt-BR")}</p>
+            <p><strong>Sistema:</strong> Cestas de Preços Públicas</p>
+          </div>
+          <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #6c757d;">
+            <p>Prefeitura Municipal de Santa Teresa - ES</p>
+          </div>
         </div>
-        
-        <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #6b7280;">
-          <p><strong>Sistema de Cestas de Preços Públicas</strong><br>
-          Prefeitura Municipal de Santa Teresa - ES<br>
-          Este é um e-mail automático, não responda.</p>
-        </div>
-      </body>
-    </html>
-  `
+      `,
+      text: `TESTE DE EMAIL - Sistema de Cestas de Preços
 
-  const text = `
-Solicitação de Cotação - ${basket.name}
+Configuração funcionando corretamente!
 
-Prezado(a) ${supplier.company_name},
+Este é um email de teste para verificar se as configurações estão funcionando.
 
-A ${basket.management_units.name} está solicitando cotação para ${basket.basket_items.length} itens.
+Data/Hora: ${new Date().toLocaleString("pt-BR")}
+Sistema: Cestas de Preços Públicas
 
-Prazo: ${new Date(deadline).toLocaleDateString('pt-BR')}
+Prefeitura Municipal de Santa Teresa - ES`
+    };
 
-Acesse: ${quotationUrl}
+    await sendEmail({
+      to: email,
+      toName: "Teste",
+      template: testTemplate,
+      variables: {}
+    });
 
-Sistema de Cestas de Preços Públicas
-Prefeitura Municipal de Santa Teresa - ES
-  `
+    return new Response(JSON.stringify({
+      success: true,
+      message: "Email de teste enviado com sucesso"
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
 
-  return { subject, html, text }
+  } catch (error) {
+    console.error("Erro ao enviar email de teste:", error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    });
+  }
 }
-
-function generateReminderEmail(response: any): EmailTemplate {
-  const baseUrl = Deno.env.get('SUPABASE_URL')?.replace('supabase.co', 'supabase.app') || 'http://localhost:5173'
-  const quotationUrl = `${baseUrl}/supplier-quote?token=${response.access_token}`
-  
-  const subject = `LEMBRETE: Cotação com prazo próximo - ${response.suppliers.company_name}`
-  
-  const html = `
-    <html>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-          <h2 style="color: #92400e; margin-top: 0;">⚠️ LEMBRETE: Prazo de Cotação</h2>
-        </div>
-        
-        <p>Prezado(a) fornecedor <strong>${response.suppliers.company_name}</strong>,</p>
-        
-        <p>Este é um lembrete sobre a cotação pendente com prazo para <strong>${new Date(response.supplier_quotations.deadline).toLocaleDateString('pt-BR')}</strong>.</p>
-        
-        <p>Sua resposta ainda não foi enviada. Para não perder esta oportunidade de negócio, acesse o link abaixo:</p>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${quotationUrl}" 
-             style="display: inline-block; background: #dc2626; color: white; padding: 15px 30px; 
-                    text-decoration: none; border-radius: 5px; font-weight: bold;">
-            ENVIAR COTAÇÃO AGORA
-          </a>
-        </div>
-        
-        <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #6b7280;">
-          <p><strong>Sistema de Cestas de Preços Públicas</strong><br>
-          Prefeitura Municipal de Santa Teresa - ES</p>
-        </div>
-      </body>
-    </html>
-  `
-
-  const text = `
-LEMBRETE: Cotação com prazo próximo
-
-Prezado(a) ${response.suppliers.company_name},
-
-Sua cotação tem prazo até ${new Date(response.supplier_quotations.deadline).toLocaleDateString('pt-BR')}.
-
-Acesse: ${quotationUrl}
-
-Sistema de Cestas de Preços Públicas
-Prefeitura Municipal de Santa Teresa - ES
-  `
-
-  return { subject, html, text }
-}
-
- 
- / /   T e s t   e m a i l   f u n c t i o n 
- a s y n c   f u n c t i o n   t e s t E m a i l ( s u p a b a s e :   a n y ,   e m a i l :   s t r i n g )   { 
-     t r y   { 
-         c o n s t   t e s t T e m p l a t e   =   { 
-             s u b j e c t :   "   T e s t e   d e   E m a i l   -   S i s t e m a   d e   C e s t a s   d e   P r e � o s " , 
-             h t m l :   ` 
-                 < d i v   s t y l e = " f o n t - f a m i l y :   A r i a l ,   s a n s - s e r i f ;   m a x - w i d t h :   6 0 0 p x ;   m a r g i n :   0   a u t o ;   p a d d i n g :   2 0 p x ; " > 
-                     < d i v   s t y l e = " b a c k g r o u n d - c o l o r :   # 2 8 a 7 4 5 ;   c o l o r :   w h i t e ;   p a d d i n g :   2 0 p x ;   t e x t - a l i g n :   c e n t e r ;   b o r d e r - r a d i u s :   8 p x ; " > 
-                         < h 1 >   T e s t e   d e   E m a i l < / h 1 > 
-                         < p > S i s t e m a   d e   C e s t a s   d e   P r e � o s   P � b l i c a s < / p > 
-                     < / d i v > 
-                     < d i v   s t y l e = " b a c k g r o u n d - c o l o r :   # f 8 f 9 f a ;   p a d d i n g :   2 0 p x ;   b o r d e r :   1 p x   s o l i d   # d e e 2 e 6 ;   m a r g i n - t o p :   2 0 p x ; " > 
-                         < h 3 > C o n f i g u r a � � o   f u n c i o n a n d o   c o r r e t a m e n t e ! < / h 3 > 
-                         < p > E s t e   �   u m   e m a i l   d e   t e s t e   p a r a   v e r i f i c a r   s e   a s   c o n f i g u r a � � e s   d e   e m a i l   e s t � o   f u n c i o n a n d o . < / p > 
-                         < p > < s t r o n g > D a t a / H o r a : < / s t r o n g >   $ { n e w   D a t e ( ) . t o L o c a l e S t r i n g ( " p t - B R " ) } < / p > 
-                         < p > < s t r o n g > S i s t e m a : < / s t r o n g >   C e s t a s   d e   P r e � o s   P � b l i c a s < / p > 
-                     < / d i v > 
-                     < d i v   s t y l e = " t e x t - a l i g n :   c e n t e r ;   m a r g i n - t o p :   2 0 p x ;   f o n t - s i z e :   1 2 p x ;   c o l o r :   # 6 c 7 5 7 d ; " > 
-                         < p > P r e f e i t u r a   M u n i c i p a l   d e   S a n t a   T e r e s a   -   E S < / p > 
-                     < / d i v > 
-                 < / d i v > 
-             ` , 
-             t e x t :   `   T E S T E   D E   E M A I L   -   S i s t e m a   d e   C e s t a s   d e   P r e � o s 
- 
- C o n f i g u r a � � o   f u n c i o n a n d o   c o r r e t a m e n t e ! 
- 
- E s t e   �   u m   e m a i l   d e   t e s t e   p a r a   v e r i f i c a r   s e   a s   c o n f i g u r a � � e s   e s t � o   f u n c i o n a n d o . 
- 
- D a t a / H o r a :   $ { n e w   D a t e ( ) . t o L o c a l e S t r i n g ( " p t - B R " ) } 
- S i s t e m a :   C e s t a s   d e   P r e � o s   P � b l i c a s 
- 
- P r e f e i t u r a   M u n i c i p a l   d e   S a n t a   T e r e s a   -   E S ` 
-         } ; 
- 
-         a w a i t   s e n d E m a i l ( { 
-             t o :   e m a i l , 
-             t o N a m e :   " T e s t e " , 
-             t e m p l a t e :   t e s t T e m p l a t e , 
-             v a r i a b l e s :   { } 
-         } ) ; 
- 
-         r e t u r n   n e w   R e s p o n s e ( J S O N . s t r i n g i f y ( { 
-             s u c c e s s :   t r u e , 
-             m e s s a g e :   " E m a i l   d e   t e s t e   e n v i a d o   c o m   s u c e s s o " 
-         } ) ,   { 
-             h e a d e r s :   {   . . . c o r s H e a d e r s ,   " C o n t e n t - T y p e " :   " a p p l i c a t i o n / j s o n "   } , 
-             s t a t u s :   2 0 0 , 
-         } ) ; 
- 
-     }   c a t c h   ( e r r o r )   { 
-         c o n s o l e . e r r o r ( " E r r o   a o   e n v i a r   e m a i l   d e   t e s t e : " ,   e r r o r ) ; 
-         r e t u r n   n e w   R e s p o n s e ( J S O N . s t r i n g i f y ( { 
-             s u c c e s s :   f a l s e , 
-             e r r o r :   e r r o r . m e s s a g e 
-         } ) ,   { 
-             h e a d e r s :   {   . . . c o r s H e a d e r s ,   " C o n t e n t - T y p e " :   " a p p l i c a t i o n / j s o n "   } , 
-             s t a t u s :   5 0 0 , 
-         } ) ; 
-     } 
- }  
- 

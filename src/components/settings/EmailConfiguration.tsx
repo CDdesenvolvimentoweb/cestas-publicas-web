@@ -37,8 +37,8 @@ export default function EmailConfiguration() {
     },
     smtp: {
       host: '',
-      port: 587,
-      secure: false,
+      port: 465,
+      secure: true,
       username: '',
       password: '',
       from_email: 'noreply@santateresa.es.gov.br',
@@ -242,6 +242,7 @@ export default function EmailConfiguration() {
                     onChange={(e) => handleSettingsChange('smtp', 'host', e.target.value)}
                     placeholder="smtp.gmail.com"
                   />
+                  <p className="text-xs text-muted-foreground">Exemplo: smtp.gmail.com, smtp.outlook.com</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Porta</Label>
@@ -249,10 +250,20 @@ export default function EmailConfiguration() {
                     type="number"
                     value={settings.smtp.port}
                     onChange={(e) => handleSettingsChange('smtp', 'port', parseInt(e.target.value))}
-                    placeholder="587"
+                    placeholder="465"
                   />
+                  <p className="text-xs text-muted-foreground">Use 465 para SSL ou 587 para TLS</p>
                 </div>
               </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-800">Configuração Recomendada</h4>
+                <p className="text-sm text-blue-700 mt-1">
+                  Para Gmail: Host: smtp.gmail.com, Porta: 465, SSL habilitado. 
+                  Você pode precisar gerar uma senha de aplicativo se tiver 2FA ativado.
+                </p>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Usuário</Label>
@@ -270,6 +281,7 @@ export default function EmailConfiguration() {
                     onChange={(e) => handleSettingsChange('smtp', 'password', e.target.value)}
                     placeholder="••••••••"
                   />
+                  <p className="text-xs text-muted-foreground">Para Gmail, use senha de aplicativo</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

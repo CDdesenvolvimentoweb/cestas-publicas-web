@@ -56,7 +56,7 @@ interface Category {
 interface MeasurementUnit {
   id: string;
   name: string;
-  abbreviation: string;
+  symbol: string;
 }
 
 interface ProductFormProps {
@@ -155,7 +155,7 @@ export const ProductForm = ({
     try {
       const { data, error } = await supabase
         .from('measurement_units')
-        .select('id, name, abbreviation')
+        .select('id, name, symbol')
         .order('name');
 
       if (error) throw error;
@@ -336,7 +336,7 @@ export const ProductForm = ({
                         <SelectContent>
                           {measurementUnits.map((unit) => (
                             <SelectItem key={unit.id} value={unit.id}>
-                              {unit.name} ({unit.abbreviation})
+                              {unit.name} ({unit.symbol})
                             </SelectItem>
                           ))}
                         </SelectContent>

@@ -48,7 +48,7 @@ interface Product {
   };
   measurement_units: {
     name: string;
-    abbreviation: string;
+    symbol: string;
   };
 }
 
@@ -115,7 +115,7 @@ export const BasketItemForm = ({
           ),
           measurement_units (
             name,
-            abbreviation
+            symbol
           )
         `)
         .eq('is_active', true)
@@ -268,7 +268,7 @@ export const BasketItemForm = ({
                       Quantidade *
                       {selectedProduct && (
                         <span className="text-muted-foreground ml-1">
-                          ({selectedProduct.measurement_units.abbreviation})
+                          ({selectedProduct.measurement_units.symbol})
                         </span>
                       )}
                     </FormLabel>

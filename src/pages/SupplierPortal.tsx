@@ -61,7 +61,7 @@ interface QuoteData {
         description?: string;
         measurement_unit: {
           name: string;
-          abbreviation: string;
+          symbol: string;
         };
       };
     };
@@ -138,7 +138,7 @@ export const SupplierPortal = () => {
                 *,
                 measurement_unit:measurement_units (
                   name,
-                  abbreviation
+                  symbol
                 )
               )
             )

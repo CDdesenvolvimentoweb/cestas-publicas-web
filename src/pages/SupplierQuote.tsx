@@ -65,7 +65,7 @@ export const SupplierQuote = () => {
             name, 
             description, 
             code,
-            measurement_unit:measurement_units(name, abbreviation)
+            measurement_unit:measurement_units(name, symbol)
           )
         `)
         .eq('basket_id', quoteData.basket_id);
@@ -347,7 +347,7 @@ export const SupplierQuote = () => {
                       <span className="font-medium">{item.basket_item?.quantity}</span>
                     </TableCell>
                     <TableCell>
-                      {item.basket_item?.product?.measurement_unit?.abbreviation}
+                      {item.basket_item?.product?.measurement_unit?.symbol}
                     </TableCell>
                     <TableCell>
                       <Input

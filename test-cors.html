@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste CORS - Edge Function</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .result {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+        }
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de CORS - Edge Function quotation-system</h1>
+    
+    <div>
+        <h3>Configuração de Teste</h3>
+        <label for="email">Email para teste:</label>
+        <input type="email" id="email" value="teste@exemplo.com" style="width: 300px; padding: 5px; margin: 5px;">
+        <br>
+        <label for="provider">Provedor:</label>
+        <select id="provider" style="width: 200px; padding: 5px; margin: 5px;">
+            <option value="mock">Mock (Simulação)</option>
+            <option value="smtp">SMTP</option>
+            <option value="sendgrid">SendGrid</option>
+        </select>
+    </div>
+
+    <div>
+        <h3>Testes</h3>
+        <button onclick="testPreflight()">1. Testar CORS Preflight (OPTIONS)</button>
+        <button onclick="testEmail()">2. Testar Envio de Email</button>
+        <button onclick="testWithoutCORS()">3. Testar sem CORS (deve falhar)</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://dortpsqvcjvmbhntnowo.supabase.co';
+        const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/quotation-system`;
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testPreflight() {
+            log('Testando CORS Preflight (OPTIONS)...');
+            try {
+                const response = await fetch(FUNCTION_URL, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'content-type'
+                    }
+                });
+
+                log(`Status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                log(`CORS Headers: ${JSON.stringify(corsHeaders, null, 2)}`, response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                log(`Erro no teste preflight: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEmail() {
+            const email = document.getElementById('email').value;
+            const provider = document.getElementById('provider').value;
+            
+            if (!email) {
+                log('Por favor, digite um email para teste', 'error');
+                return;
+            }
+
+            log(`Testando envio de email para ${email} via ${provider}...`);
+            
+            try {
+                const response = await fetch(FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
+                    },
+                    body: JSON.stringify({
+                        action: 'test_email',
+                        emailConfig: {
+                            service: provider,
+                            fromEmail: 'teste@sistema.com',
+                            fromName: 'Sistema de Teste'
+                        }
+                    })
+                });
+
+                log(`Status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                const data = await response.json();
+                log(`Resposta: ${JSON.stringify(data, null, 2)}`, response.ok ? 'success' : 'error');
+                
+            } catch (error) {
+                log(`Erro no teste de email: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWithoutCORS() {
+            log('Testando requisição sem headers CORS (deve falhar)...');
+            
+            try {
+                const response = await fetch(FUNCTION_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Força modo sem CORS
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'test_email'
+                    })
+                });
+
+                log(`Status sem CORS: ${response.status} (type: ${response.type})`, 'info');
+                
+            } catch (error) {
+                log(`Erro esperado sem CORS: ${error.message}`, 'info');
+            }
+        }
+
+        // Executar teste inicial
+        window.onload = function() {
+            log('Página carregada. Pronto para testes.');
+            log(`URL da função: ${FUNCTION_URL}`);
+        };
+    </script>
+</body>
+</html>

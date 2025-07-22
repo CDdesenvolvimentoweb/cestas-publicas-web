@@ -303,80 +303,6 @@ export type Database = {
         }
         Relationships: []
       }
-      external_price_records: {
-        Row: {
-          created_at: string | null
-          id: string
-          integration_source_id: string | null
-          location_city: string | null
-          location_uf: string | null
-          procurement_date: string | null
-          procurement_number: string | null
-          procurement_type: string | null
-          product_code: string | null
-          product_description: string
-          quantity: number | null
-          raw_data: Json | null
-          source_document_url: string | null
-          supplier_cnpj: string | null
-          supplier_name: string | null
-          total_price: number | null
-          unit_measure: string | null
-          unit_price: number
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          integration_source_id?: string | null
-          location_city?: string | null
-          location_uf?: string | null
-          procurement_date?: string | null
-          procurement_number?: string | null
-          procurement_type?: string | null
-          product_code?: string | null
-          product_description: string
-          quantity?: number | null
-          raw_data?: Json | null
-          source_document_url?: string | null
-          supplier_cnpj?: string | null
-          supplier_name?: string | null
-          total_price?: number | null
-          unit_measure?: string | null
-          unit_price: number
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          integration_source_id?: string | null
-          location_city?: string | null
-          location_uf?: string | null
-          procurement_date?: string | null
-          procurement_number?: string | null
-          procurement_type?: string | null
-          product_code?: string | null
-          product_description?: string
-          quantity?: number | null
-          raw_data?: Json | null
-          source_document_url?: string | null
-          supplier_cnpj?: string | null
-          supplier_name?: string | null
-          total_price?: number | null
-          unit_measure?: string | null
-          unit_price?: number
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "external_price_records_integration_source_id_fkey"
-            columns: ["integration_source_id"]
-            isOneToOne: false
-            referencedRelation: "external_price_integrations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       management_units: {
         Row: {
           address: string | null
@@ -959,31 +885,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      analyze_price_trends: {
-        Args: {
-          product_id_param?: string
-          management_unit_id_param?: string
-          days_back?: number
-        }
-        Returns: {
-          product_id: string
-          product_name: string
-          category_name: string
-          avg_price: number
-          min_price: number
-          max_price: number
-          price_variance: number
-          trend_direction: string
-          quote_count: number
-        }[]
-      }
       approve_product_request: {
         Args: { request_id: string; admin_response_param?: string }
         Returns: string
-      }
-      calculate_basket_statistics: {
-        Args: { basket_id_param: string }
-        Returns: Json
       }
       get_current_user_management_unit: {
         Args: Record<PropertyKey, never>
@@ -992,10 +896,6 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
-      }
-      get_dashboard_statistics: {
-        Args: { management_unit_id_param?: string; days_back?: number }
-        Returns: Json
       }
       reject_product_request: {
         Args: { request_id: string; admin_response_param: string }

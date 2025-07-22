@@ -41,7 +41,7 @@ interface BasketItem {
     code?: string;
     measurement_units: {
       name: string;
-      abbreviation: string;
+      symbol: string;
     };
     product_categories: {
       name: string;
@@ -103,7 +103,7 @@ export const BasketDetails = ({
             code,
             measurement_units (
               name,
-              abbreviation
+              symbol
             ),
             product_categories (
               name
@@ -317,7 +317,7 @@ export const BasketDetails = ({
                           <div className="text-sm text-muted-foreground space-y-1">
                             <p>Categoria: {item.products.product_categories.name}</p>
                             <p>
-                              Quantidade: {item.quantity} {item.products.measurement_units.abbreviation}
+                              Quantidade: {item.quantity} {item.products.measurement_units.symbol}
                             </p>
                             {item.lot_number && <p>Lote: {item.lot_number}</p>}
                             {item.observations && <p>Observações: {item.observations}</p>}

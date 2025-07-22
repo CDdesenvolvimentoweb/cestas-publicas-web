@@ -33,7 +33,7 @@ interface ProductCategory {
 interface MeasurementUnit {
   id: string;
   name: string;
-  abbreviation: string;
+  symbol: string;
 }
 
 interface DuplicateProduct {
@@ -96,7 +96,7 @@ export function ProductRequestForm({ onClose, onSuccess, onCheckDuplicates, dupl
     try {
       const { data, error } = await supabase
         .from("measurement_units")
-        .select("id, name, abbreviation")
+        .select("id, name, symbol")
         .order("name");
 
       if (error) throw error;
@@ -325,7 +325,7 @@ export function ProductRequestForm({ onClose, onSuccess, onCheckDuplicates, dupl
                       <SelectContent>
                         {measurementUnits.map((unit) => (
                           <SelectItem key={unit.id} value={unit.id}>
-                            {unit.name} ({unit.abbreviation})
+                            {unit.name} ({unit.symbol})
                           </SelectItem>
                         ))}
                       </SelectContent>

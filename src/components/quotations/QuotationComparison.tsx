@@ -44,7 +44,7 @@ export const QuotationComparison = ({ basketId, onClose }: QuotationComparisonPr
             *,
             basket_item:basket_items(
               *,
-              product:products(name, measurement_unit:measurement_units(abbreviation))
+              product:products(name, measurement_unit:measurement_units(symbol))
             )
           )
         `)

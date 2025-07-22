@@ -59,12 +59,6 @@ const navigationItems = [
     roles: ['admin', 'servidor', 'fornecedor'],
   },
   {
-    title: 'Preços Históricos',
-    href: '/dashboard',
-    icon: TrendingUp,
-    roles: ['admin', 'servidor'],
-  },
-  {
     title: 'Relatórios',
     href: '/app/reports',
     icon: Download,
