@@ -15,6 +15,8 @@ import {
   TrendingUp,
   Download,
   Mail,
+  DollarSign,
+  Globe,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -87,6 +89,12 @@ const navigationItems = [
     href: '/app/integrations',
     icon: Settings,
     roles: ['admin'],
+  },
+  {
+    title: 'Preços PNCP',
+    href: '/app/pncp-precos',
+    icon: Globe,
+    roles: ['admin', 'servidor'],
   },
   {
     title: 'Configurações de Email',

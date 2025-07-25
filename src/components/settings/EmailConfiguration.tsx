@@ -128,15 +128,15 @@ export default function EmailConfiguration() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
-        title: 'Email de teste enviado!',
-        description: `Email enviado para ${testEmail}. Verifique sua caixa de entrada.`
+        title: '✅ Email de teste enviado!',
+        description: `Email enviado para ${testEmail}. ${data?.message || 'Verifique sua caixa de entrada e spam.'}`
       });
     },
     onError: (error) => {
       toast({
-        title: 'Erro no teste',
+        title: '❌ Erro no teste',
         description: 'Erro ao enviar email de teste: ' + (error as Error).message,
         variant: 'destructive'
       });
@@ -256,15 +256,17 @@ export default function EmailConfiguration() {
                 </div>
               </div>
               
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-800">Configuração Recomendada</h4>
-                <p className="text-sm text-blue-700 mt-1">
-                  Para Gmail: Host: smtp.gmail.com, Porta: 465, SSL habilitado. 
-                  Você pode precisar gerar uma senha de aplicativo se tiver 2FA ativado.
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="font-medium text-blue-800">📧 Configuração SMTP</h4>
+            <p className="text-sm text-blue-700 mt-1">
+              Para Gmail: Host: smtp.gmail.com, Porta: 465, SSL habilitado. 
+              Você pode precisar gerar uma senha de aplicativo se tiver 2FA ativado.
+            </p>
+            <div className="mt-2 text-xs text-blue-600">
+              <p>✅ O sistema tentará múltiplos métodos de envio automaticamente</p>
+              <p>✅ Emails serão enfileirados se o envio direto falhar</p>
+            </div>
+          </div>              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Usuário</Label>
                   <Input
@@ -346,7 +348,8 @@ export default function EmailConfiguration() {
             </div>
           </div>
           <p className="text-sm text-muted-foreground">
-            Um email de teste será enviado para verificar se as configurações estão funcionando corretamente.
+            🔧 Um email de teste será enviado usando múltiplos métodos de entrega para garantir que chegue ao destino.
+            O sistema tentará: Resend → Mailgun → SendGrid → SMTP Bridge → Queue local
           </p>
         </CardContent>
       </Card>

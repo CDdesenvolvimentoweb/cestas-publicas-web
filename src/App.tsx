@@ -12,6 +12,7 @@ import { Suppliers } from "@/pages/Suppliers";
 import { ProductCategories } from "@/pages/ProductCategories";
 import Products from "@/pages/Products";
 import { PriceBaskets } from "@/pages/PriceBaskets";
+import PNCPPrecos from "@/pages/PNCPPrecos";
 import { Quotations } from "@/pages/Quotations";
 import { SupplierQuote } from "@/pages/SupplierQuote";
 import SupplierQuotation from "@/pages/SupplierQuotation";
@@ -24,6 +25,7 @@ import Integrations from "@/pages/Integrations";
 import EmailSettings from "@/pages/EmailSettings";
 import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
+import { PncpSearch } from "./components/temp/PncpSearch";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,9 @@ const App = () => (
           <Route path="/quotation/:token" element={<SupplierQuotation />} />
           <Route path="/supplier-portal/:token" element={<SupplierPortal />} />
           
+          {/* Test Route */}
+          <Route path="/pncp-search" element={<PncpSearch />} />
+
           {/* Protected routes */}
           <Route path="/dashboard" element={
             <AuthLayout>
@@ -63,6 +68,7 @@ const App = () => (
             <Route path="quotations" element={<Quotations />} />
             <Route path="reports" element={<Reports />} />
             <Route path="integrations" element={<Integrations />} />
+            <Route path="pncp-precos" element={<PNCPPrecos />} />
             <Route path="email-settings" element={<EmailSettings />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="unit-dashboard" element={<UnitDashboard />} />

@@ -19,7 +19,7 @@ max_client_conn = 100
 
 [realtime]
 enabled = true
-ip_version = "ipv6"
+ip_version = "IPv4"
 
 [studio]
 enabled = true
@@ -50,9 +50,6 @@ enable_signup = true
 double_confirm_changes = true
 enable_confirmations = false
 
-[edge_functions]
-enabled = true
-
 [functions.notification-service]
 verify_jwt = false
 
@@ -70,3 +67,10 @@ verify_jwt = false
 
 [functions.create-admin-user]
 verify_jwt = false
+
+[functions.pncp-integration]
+verify_jwt = false
+
+[functions.fetch-pncp-prices]
+verify_jwt = false
+allowed_http_methods = ["OPTIONS", "POST", "GET"]

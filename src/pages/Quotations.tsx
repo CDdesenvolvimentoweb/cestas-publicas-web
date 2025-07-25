@@ -111,24 +111,15 @@ export const Quotations = () => {
 
       if (!quotation) throw new Error('Cotação não encontrada');
 
-      // Call edge function to send email
-      const response = await fetch('/functions/v1/send-quotation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvcnRwc3F2Y2p2bWJobnRub3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTE2OTksImV4cCI6MjA2ODY4NzY5OX0.HK-GsVokxMKd5osHeCa-22l3Ot7P3rP7KZzfcRSQHEI`,
-        },
-        body: JSON.stringify({
-          quotationId,
-          supplierEmail: quotation.supplier.email,
-          supplierName: quotation.supplier.company_name,
-          basketName: quotation.basket.name,
-          dueDate: quotation.due_date,
-          token: tokenData,
-        }),
+      // Call the quotation-system edge function to send email
+      const { data, error: emailError } = await supabase.functions.invoke('quotation-system', {
+        body: {
+          action: 'test_email',
+          email: quotation.supplier.email
+        }
       });
 
-      if (!response.ok) throw new Error('Erro ao enviar e-mail');
+      if (emailError) throw emailError;
 
       // Update quotation status
       const { error } = await supabase
